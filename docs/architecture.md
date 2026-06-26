@@ -10,8 +10,9 @@
   starts, processes a handful of statements, writes the workbook, exits. Spring Boot's value
   (DI-at-scale, embedded server, autoconfig, lifecycle) buys nothing here and adds startup
   cost/weight. The dependency graph is small and fixed → **manual wiring in `main()`**.
-- **CLI args:** plain `args[]` — an optional config-file path (defaults to the classpath
-  `config.yaml`). No other flags yet; picocli only if the option set grows.
+- **CLI args:** plain `args[]` — an optional config-file path. With no arg, `Main` loads config
+  from the classpath, **preferring `config.local.yaml` (real, gitignored) and falling back to the
+  committed `config.yaml` template**. No other flags yet; picocli only if the option set grows.
 - **Build:** **Maven**. Run via `exec:java` or the IntelliJ run config; a single runnable
   (shaded) jar is deferred.
 - **Logging:** SLF4J via **slf4j-simple → stdout** (configured in `simplelogger.properties`);
@@ -56,7 +57,7 @@
 
 ## Configuration & secrets
 
-- **Config in YAML** (Jackson or SnakeYAML): accounts, mandates, paths (+ master sheet name),
+- **Config in YAML** (SnakeYAML): accounts, mandates, paths (+ master sheet name),
   and the ordered tagging rules. Parsed into typed records, **validated up front (fail-loud)** in
   `ConfigLoader.validate`: duplicate labels, a card mandate → unknown bank, or an active card
   missing its payment pattern. (PDF-pattern ambiguity is left to discovery's run-time multi-match
@@ -69,8 +70,8 @@ A unique friendly **Label** per account is the single key used consistently acro
 **matrix column(s)**, the Transactions **`Bank` column**, **mandates**, and the **Keychain**
 (service `expense-tracker`, account = the Label, read via `security find-generic-password`). Because
 it drives a distinct matrix column it must be unique — which is how two same-issuer cards stay
-separate. **The concrete labels live in `config.yaml`, not here**, so the design stays generic when
-accounts are added or renamed.
+separate. **The concrete labels live in the config file (`config.local.yaml`, or the `config.yaml`
+template), not here**, so the design stays generic when accounts are added or renamed.
 
 The Label is independent of the **PDF-match pattern**, the card **payment-identification pattern**,
 and the **password** — those are separate per-account fields. One extra Keychain key, **`MASTER`**,
@@ -78,9 +79,12 @@ holds the workbook password (the input/output Excel is encrypted at rest; the sa
 fetches it to open and re-save the workbook).
 
 ### Run configuration (current setup; all config-driven)
-- **Config file:** `src/main/resources/config.yaml` (loaded from the classpath; pass a path
-  argument to `Main`/`exec.args` to override with an external file).
-- **Input workbook and output** both point at the working directory `~/Downloads/working`.
+- **Config file:** the committed `src/main/resources/config.yaml` is a **placeholder template**;
+  real values live in `src/main/resources/config.local.yaml` (**gitignored**). `Main` auto-loads
+  `config.local.yaml` from the classpath when present, else the template; an explicit path
+  argument (`Main`/`exec.args`) overrides both.
+- **Input workbook and output** both point at the configured working directory (a local folder);
+  the template uses a placeholder path, the real path lives in `config.local.yaml`.
 - **Master matrix sheet name:** `Expenses`.
 - **Month row key:** the workbook uses **1st-of-month** dates (`01-May-2026`), not end-of-month.
   (Older 2025 rows use end-of-month; new appends follow the current 2026 convention.)
