@@ -149,9 +149,15 @@ CLI (args)
        └─ WorkbookService (POI)
 ```
 
-**Boundary discipline:** only `PdfTextExtractor` knows PDF mechanics; only `WorkbookService`
-knows Excel; the middle (tagging, aggregation, reconciliation) is **pure domain logic, no I/O** —
-which is where the business rules live and where unit tests concentrate.
+**Boundary discipline:** two layers, cleanly separated —
+- **Pure computation layer** (stateless, no I/O): `TaggingEngine`, `PinnedOverrides`,
+  `Treatment`/`Bucket`, `Aggregator`, `CardPaymentMatcher`, `Reconciler`, `StatementOverlap`,
+  `StatementBalanceValidator`. This is where the business rules live and where unit tests concentrate.
+- **System services** (the only components that touch the outside world): `PdfTextExtractor` (PDF),
+  `WorkbookService` (Excel), `SecretsProvider` (Keychain), `StatementDiscovery` (filesystem),
+  `ConfigLoader` (YAML).
+
+The computation layer never imports POI/PDF/file APIs, so "the middle" stays trivially testable.
 
 **Card-payment resolution is one shared rule.** `CardPaymentMatcher` (mandate bank + payment
 pattern → card, fail-loud on >1) is used **both** when the Transactions sheet's `System Note` is
@@ -173,11 +179,14 @@ column is derived (never read back) and recomputed on every `regenerate`.
   are **re-applied** (`PinnedOverrides.apply`, by normalized transaction identity) and re-marked
   `TRUE`; the pinned tag is what's used at `complete`. (Pins are date-keyed, so they only matter
   within their own review cycle — no cross-month durability needed.)
-- **Verified-card state** → the **green fill is not cosmetic; it is persisted workbook state**
-  meaning "this card amount was confirmed against the bank debit." Reconciliation reads it back
-  (`isVerified`) to **skip already-verified cells**, so the cell colour is a real part of the data
-  model — not just presentation. (Only a newer *statement* re-opens it; see the card two-state
-  colour above.) Treat it as state, never as decoration.
+- **Verified-card state** → conceptually each card cell carries a logical **`verified` flag**; the
+  **green fill is that flag's presentation, with the Excel fill as its storage medium** (there is no
+  separate boolean — the colour *is* the stored flag). Reconciliation reads it back
+  (`MatrixCellStyles.isGreen` via `isVerified`) to **skip already-verified cells**, so the colour is
+  a real part of the data model, not decoration. The mapping is deliberately one place
+  (`MatrixCellStyles`): `verified → green`, `unverified → yellow`, `revised → amber`. Keeping the
+  colour↔flag translation centralized is what avoids "why is this green?" debugging later. (Only a
+  newer *statement* re-opens a green cell; see the card colour states above.)
 
 ## Parser design
 
@@ -251,11 +260,12 @@ and live on existing components (not a separate validator framework), grouped by
 | **Parse** | extracted txns reconcile to printed totals (`opening + credits − debits = closing`) | `StatementBalanceValidator` |
 | **Reconciliation** | a `cc-payment` debit matches exactly one card; ≥2 debits for the same card/month → abort | `CardPaymentMatcher` / `Reconciler` |
 
-The **parse-correctness guard** deserves emphasis: it is enforced at run time — if a bank statement
-prints opening/closing balances and they don't reconcile, the run **aborts** (a statement that
-prints no balances simply isn't checked this way). *(Parse validation is kept deliberately distinct,
-in name and package, from credit-card **reconciliation** in `com.expensetracker.recon`, which
-matches a card's bill against the bank debit.)*
+Two notes on the table:
+- The **parse guard** only applies when a statement actually prints opening/closing balances; one
+  that prints none simply isn't checked this way (it can't be).
+- **Parse validation ≠ reconciliation.** `StatementBalanceValidator` (does the *extraction* add up?)
+  is deliberately separate, in name and package, from credit-card **reconciliation** in
+  `com.expensetracker.recon` (does the *card bill* match the bank debit?).
 
 ## Testing strategy
 
