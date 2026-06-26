@@ -9,7 +9,7 @@ and nothing goes to any third-party/AI processor.
 
 **Implemented** — end-to-end pipeline runs on real encrypted statements and writes the
 password-protected output workbook, with the full pending/complete/regenerate review loop and
-pinned one-off overrides. 124 unit tests. See [README.md](README.md) for how to run.
+pinned one-off overrides. 129 unit tests. See [README.md](README.md) for how to run.
 (Open items: AXIS CC OCR, a packaged jar — see README / architecture.)
 
 ## Docs

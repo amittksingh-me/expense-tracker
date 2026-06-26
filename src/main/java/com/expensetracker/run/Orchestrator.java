@@ -30,10 +30,14 @@ import com.expensetracker.workbook.WorkbookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -80,6 +84,14 @@ public final class Orchestrator {
             config.banks().forEach(b -> wb.registerBank(b.label()));
             config.cards().forEach(c -> wb.registerCard(c.label()));
 
+            // Integrity guard: the matrix must hold at most one row per month. Duplicates mean the
+            // workbook was hand-edited/corrupted; writing would silently update only one — fail loud.
+            List<LocalDate> dupMonths = wb.duplicateMonthRows();
+            if (!dupMonths.isEmpty()) {
+                throw new IllegalStateException("Matrix has duplicate Month Key rows for " + dupMonths
+                        + " — at most one row per month is allowed; fix the workbook and re-run.");
+            }
+
             if (firstRun) {
                 log.info("first run (no working copy) — generating review surface");
                 generatePending(wb, matches, List.of());
@@ -108,6 +120,7 @@ public final class Orchestrator {
                     wb.deleteTransactionsSheet();
                     wb.setStatus("complete");
                     wb.save(output, master);
+                    archiveProcessed(matches);   // cycle done → move PDFs out of the active working dir
                     log.info("STATUS=complete -> bank figures pushed, cards reconciled, "
                             + "Transactions sheet removed. Copy the workbook back to finalize.");
                 }
@@ -117,13 +130,47 @@ public final class Orchestrator {
                     wb.save(output, master);
                     log.info("STATUS=regenerate -> review surface rebuilt (pins re-applied); back to pending.");
                 }
-                default -> log.info("STATUS=pending -> awaiting review. "
-                        + "Set Control!B1 = complete or regenerate, then re-run.");
+                default -> {
+                    // pending claims a review sheet exists; if it's gone the workbook is inconsistent
+                    // (don't silently rebuild after an accidental edit). regenerate is the recovery path.
+                    if (!wb.hasTransactionsSheet()) {
+                        throw new IllegalStateException("STATUS=" + state + " but the Transactions sheet "
+                                + "is missing — workbook is inconsistent. Set Control!B1 = regenerate to "
+                                + "rebuild the review sheet from the statements.");
+                    }
+                    log.info("STATUS=pending -> awaiting review. "
+                            + "Set Control!B1 = complete or regenerate, then re-run.");
+                }
             }
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * After a finalized run, move the cycle's statement PDFs into {@code workingDir/processed/<run_id>/}
+     * so only unprocessed PDFs remain active (prevents accidental reprocessing; keeps an audit trail).
+     * {@code Files.list} in discovery is top-level only, so the archive is never re-scanned.
+     */
+    private void archiveProcessed(List<StatementDiscovery.Match> matches) {
+        if (matches.isEmpty()) {
+            return;
+        }
+        String runId = "run-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        Path dest = config.workingDir().resolve("processed").resolve(runId);
+        try {
+            Files.createDirectories(dest);
+            for (StatementDiscovery.Match m : matches) {
+                Path f = m.file();
+                if (Files.exists(f)) {
+                    Files.move(f, dest.resolve(f.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                    log.info("  archived {} -> processed/{}/", f.getFileName(), runId);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to archive processed PDFs to " + dest, e);
         }
     }
 

@@ -7,18 +7,13 @@ import org.apache.poi.poifs.crypt.EncryptionMode;
 import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
@@ -29,7 +24,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,11 +58,7 @@ public final class WorkbookService implements AutoCloseable {
     private final int colMedian;
     private final int colYear;
     private final int colAverage;
-    private static final String VERIFIED_GREEN = "9BBB59";   // matches the existing verified-CC fill
-    private final int refRow;                                // existing data row to copy fonts/formats from
-    private final CellStyle verifiedStyle;
-    private final Map<Integer, CellStyle> baseCache = new HashMap<>();
-    private final Map<Integer, CellStyle> unverifiedCache = new HashMap<>();
+    private final MatrixCellStyles styles;                   // builds/caches base/yellow/amber/green + green detection
 
     private WorkbookService(Workbook wb, String masterSheet) {
         this.wb = wb;
@@ -89,75 +83,8 @@ public final class WorkbookService implements AutoCloseable {
         }
         this.allBankNetCols = nets.stream().mapToInt(Integer::intValue).toArray();
 
-        this.refRow = lastDataRow();              // copy fonts/number formats from an existing data row
-        this.verifiedStyle = buildVerifiedStyle();
-    }
-
-    /**
-     * A style for writing into {@code col}, cloned from the reference row's cell in that column
-     * (so it keeps the existing font/size + number format), with any fill removed. Cached per column.
-     */
-    private CellStyle baseStyleFor(int col) {
-        return baseCache.computeIfAbsent(col, c -> {
-            CellStyle s = wb.createCellStyle();
-            Row rr = refRow >= 0 ? sheet.getRow(refRow) : null;
-            Cell ref = rr == null ? null : rr.getCell(c);
-            if (ref != null) {
-                s.cloneStyleFrom(ref.getCellStyle());
-            }
-            s.setFillPattern(FillPatternType.NO_FILL);
-            s.setWrapText(false);
-            return s;
-        });
-    }
-
-    /**
-     * Base style for {@code col} plus a light-yellow fill — the <b>unverified</b> card state: an
-     * amount taken straight from a card statement, not yet confirmed against the bank payment.
-     * Reconciliation later replaces it with {@link #verifiedStyle} (green).
-     */
-    private CellStyle unverifiedStyleFor(int col) {
-        return unverifiedCache.computeIfAbsent(col, c -> {
-            CellStyle s = wb.createCellStyle();
-            s.cloneStyleFrom(baseStyleFor(c));
-            s.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
-            s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            return s;
-        });
-    }
-
-    /** The verified-CC (green) style, cloned from an existing green cell so the shade + font match exactly. */
-    private CellStyle buildVerifiedStyle() {
-        for (int r = FIRST_DATA_ROW; r <= sheet.getLastRowNum(); r++) {
-            Row row = sheet.getRow(r);
-            if (row == null) {
-                continue;
-            }
-            for (int c = 1; c <= 6; c++) {                 // scan the card columns for an existing green cell
-                Cell cell = row.getCell(c);
-                if (cell != null && isGreenCell(cell)) {
-                    CellStyle s = wb.createCellStyle();
-                    s.cloneStyleFrom(cell.getCellStyle());
-                    s.setWrapText(false);
-                    return s;
-                }
-            }
-        }
-        XSSFCellStyle s = (XSSFCellStyle) wb.createCellStyle();   // fallback if none found
-        s.setFillForegroundColor(new XSSFColor(new byte[]{(byte) 0x9B, (byte) 0xBB, (byte) 0x59}, null));
-        s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        return s;
-    }
-
-    private static boolean isGreenCell(Cell cell) {
-        CellStyle st = cell.getCellStyle();
-        if (st.getFillPattern() != FillPatternType.SOLID_FOREGROUND) {
-            return false;
-        }
-        return st instanceof XSSFCellStyle xs
-                && xs.getFillForegroundColorColor() instanceof XSSFColor xc
-                && xc.getARGBHex() != null
-                && xc.getARGBHex().toUpperCase().endsWith(VERIFIED_GREEN);
+        // existing data row to copy fonts/number formats from; styler also detects the verified-green fill
+        this.styles = new MatrixCellStyles(wb, sheet, lastDataRow(), FIRST_DATA_ROW);
     }
 
     /** Opens (decrypts) the workbook. */
@@ -197,6 +124,32 @@ public final class WorkbookService implements AutoCloseable {
         bankCols.put(label, new int[]{debits, debits + 1, debits + 2});
     }
 
+    /**
+     * Month Keys that appear in more than one matrix data row. The matrix must hold at most one row
+     * per month; duplicates mean the workbook was hand-edited/corrupted, and writing would silently
+     * update only one of them — callers should abort (fail-loud).
+     */
+    public List<LocalDate> duplicateMonthRows() {
+        Map<LocalDate, Integer> counts = new LinkedHashMap<>();
+        for (int r = FIRST_DATA_ROW; r <= sheet.getLastRowNum(); r++) {
+            Row row = sheet.getRow(r);
+            if (row == null) {
+                continue;
+            }
+            Cell c = row.getCell(dateCol);
+            if (c != null && c.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(c)) {
+                counts.merge(c.getLocalDateTimeCellValue().toLocalDate(), 1, Integer::sum);
+            }
+        }
+        List<LocalDate> dups = new ArrayList<>();
+        counts.forEach((month, n) -> {
+            if (n > 1) {
+                dups.add(month);
+            }
+        });
+        return dups;
+    }
+
     /** Find the data row for an end-of-month date, or -1. */
     public int findMonthRow(LocalDate eom) {
         for (int r = FIRST_DATA_ROW; r <= sheet.getLastRowNum(); r++) {
@@ -222,12 +175,14 @@ public final class WorkbookService implements AutoCloseable {
             throw new IllegalStateException("Card column not registered: " + cardLabel);
         }
         int r = ensureRow(eom);
-        // A newly processed statement is authoritative for that card/month: it overwrites any
-        // prior value (including a previously-verified green cell) and lands as unverified (yellow)
-        // until reconciliation confirms it against the bank debit.
+        // A newly processed statement is authoritative for that card/month: it overwrites any prior
+        // value. If the prior value was verified (green), reprocessing it lands as **amber**
+        // ("a trusted value changed — review me"); otherwise it lands as unverified (yellow).
+        // Either way reconciliation can later confirm it against the bank debit (→ green).
+        boolean wasVerified = isVerified(r, col);
         Cell c = cell(r, col);
         c.setCellValue(total.doubleValue());
-        c.setCellStyle(unverifiedStyleFor(col));
+        c.setCellStyle(wasVerified ? styles.amber(col) : styles.unverified(col));
     }
 
     /** Write a bank's monthly figures (Bank Debits, Credits/Transfers, Net formula). */
@@ -242,7 +197,7 @@ public final class WorkbookService implements AutoCloseable {
         // Net Expenses as a live formula = debits - credits
         Cell net = cell(r, cols[2]);
         net.setCellFormula(colLetter(cols[0]) + (r + 1) + "-" + colLetter(cols[1]) + (r + 1));
-        net.setCellStyle(baseStyleFor(cols[2]));
+        net.setCellStyle(styles.base(cols[2]));
     }
 
     /** Reconciliation: set a prior month's card column to the actual amount, highlighted. Returns old value or null. */
@@ -261,7 +216,7 @@ public final class WorkbookService implements AutoCloseable {
         Cell c = cell(r, col);
         BigDecimal old = c.getCellType() == CellType.NUMERIC ? BigDecimal.valueOf(c.getNumericCellValue()) : null;
         c.setCellValue(actual.doubleValue());   // correct down if different; confirm if equal
-        c.setCellStyle(verifiedStyle);          // mark verified (green)
+        c.setCellStyle(styles.verified());          // mark verified (green)
         return old;
     }
 
@@ -351,7 +306,7 @@ public final class WorkbookService implements AutoCloseable {
         r = lastDataRow() + 1;
         Cell date = cell(r, dateCol);
         date.setCellValue(eom);
-        date.setCellStyle(baseStyleFor(dateCol));
+        date.setCellStyle(styles.base(dateCol));
         writeDerivedFormulas(r);
         return r;
     }
@@ -392,12 +347,12 @@ public final class WorkbookService implements AutoCloseable {
         setArray(r, colMedian, "MEDIAN(IF(" + yr + "=" + colLetter(colYear) + e + "," + tot + "))");
         setArray(r, colAverage, "AVERAGE(IF(" + yr + "=" + colLetter(colYear) + e + "," + tot + "))");
 
-        cell(r, colNetBank).setCellStyle(baseStyleFor(colNetBank));
-        cell(r, colCcExpense).setCellStyle(baseStyleFor(colCcExpense));
-        cell(r, colTotal).setCellStyle(baseStyleFor(colTotal));
-        cell(r, colMedian).setCellStyle(baseStyleFor(colMedian));
-        cell(r, colAverage).setCellStyle(baseStyleFor(colAverage));
-        cell(r, colYear).setCellStyle(baseStyleFor(colYear));
+        cell(r, colNetBank).setCellStyle(styles.base(colNetBank));
+        cell(r, colCcExpense).setCellStyle(styles.base(colCcExpense));
+        cell(r, colTotal).setCellStyle(styles.base(colTotal));
+        cell(r, colMedian).setCellStyle(styles.base(colMedian));
+        cell(r, colAverage).setCellStyle(styles.base(colAverage));
+        cell(r, colYear).setCellStyle(styles.base(colYear));
     }
 
     private int[] cardSpan() {
@@ -417,7 +372,7 @@ public final class WorkbookService implements AutoCloseable {
     private void setNumber(int r, int col, BigDecimal value) {
         Cell c = cell(r, col);
         c.setCellValue(value.doubleValue());
-        c.setCellStyle(baseStyleFor(col));
+        c.setCellStyle(styles.base(col));
     }
 
     private boolean isVerified(int r, int col) {
@@ -426,7 +381,7 @@ public final class WorkbookService implements AutoCloseable {
             return false;
         }
         Cell c = row.getCell(col);
-        return c != null && isGreenCell(c);
+        return c != null && MatrixCellStyles.isGreen(c);
     }
 
     private Cell cell(int r, int col) {

@@ -43,29 +43,39 @@
   - `setForceFormulaRecalculation(true)` so year-scoped Median/Average refresh on open;
   - on `regenerate`, carry pinned rows over in place; delete the Transactions sheet on `complete`.
 
+- **System-owned-cells invariant** (mirrors the requirements). `WorkbookService` **owns and may
+  update**: the **credit-card totals**, each bank's **`Bank Debits`** and **`Credits/Transfers`**,
+  the **card-cell verification colour** (yellow/green/amber), and the **`Transactions`** and
+  **`Control`** sheets. It **never writes** the **formula** columns (kept as live Excel formulas)
+  or the **manual `Comments`** column. This invariant is the contract that lets the workbook stay
+  the source of truth while the system safely re-runs.
+
+- **Internal collaborators** (one public API, composed internally): the `Transactions` sheet
+  read/write lives in **`TransactionsSheet`**; cell-style/colour construction lives in a
+  **`MatrixCellStyles`** helper. The matrix upsert + month-row mechanics stay in `WorkbookService`.
+
 ## Configuration & secrets
 
 - **Config in YAML** (Jackson or SnakeYAML): accounts, mandates, paths (+ master sheet name),
-  and the ordered tagging rules. Parsed into typed records, validated up front (fail-loud).
+  and the ordered tagging rules. Parsed into typed records, **validated up front (fail-loud)** in
+  `ConfigLoader.validate`: duplicate labels, a card mandate → unknown bank, or an active card
+  missing its payment pattern. (PDF-pattern ambiguity is left to discovery's run-time multi-match
+  abort.)
 - **Passwords never live in config.** A `SecretsProvider` fetches each statement password from
   the **macOS Keychain** via the `security` CLI on demand (never logged).
 
 ### Account labels (the identifier)
-A unique friendly **Label** per account is the single key used across **config**, the **matrix
-column(s)**, the Transactions **`Bank` column**, and the **Keychain** (service `expense-tracker`,
-account = the Label, read via `security find-generic-password`). Because it drives a distinct
-matrix column, it must be unique — which is how two HDFC cards stay separate.
+A unique friendly **Label** per account is the single key used consistently across **config**, the
+**matrix column(s)**, the Transactions **`Bank` column**, **mandates**, and the **Keychain**
+(service `expense-tracker`, account = the Label, read via `security find-generic-password`). Because
+it drives a distinct matrix column it must be unique — which is how two same-issuer cards stay
+separate. **The concrete labels live in `config.yaml`, not here**, so the design stays generic when
+accounts are added or renamed.
 
-Current labels (will live in config):
-- **Bank accounts (3):** `HDFC`, `YES`, `NIYO`
-- **Credit cards (4):** `HDFC CC`, `YES CC`, `AXIS CC`, `HDFC RUPAY`
-- **Workbook password:** key `MASTER` — the input/output Excel is **password-protected**; the same
-  `SecretsProvider` fetches this to open and re-save the encrypted workbook.
-
-All verified accessible in Keychain (service `expense-tracker`).
-
-The Label is independent of the **PDF-match pattern**, the card **payment-identification
-pattern**, and the **password** (Keychain) — those are separate per-account fields.
+The Label is independent of the **PDF-match pattern**, the card **payment-identification pattern**,
+and the **password** — those are separate per-account fields. One extra Keychain key, **`MASTER`**,
+holds the workbook password (the input/output Excel is encrypted at rest; the same `SecretsProvider`
+fetches it to open and re-save the workbook).
 
 ### Run configuration (current setup; all config-driven)
 - **Config file:** `src/main/resources/config.yaml` (loaded from the classpath; pass a path
@@ -78,12 +88,17 @@ pattern**, and the **password** (Keychain) — those are separate per-account fi
   New rows **clone their cell styles from an existing data row** (and the verified-green style
   from an existing green cell), so font/size (14), number format, and the exact green shade all
   match — rather than building styles from scratch.
-- **Card-cell two-state colour:** **yellow** fill = *unverified* (written from a card statement,
-  not yet reconciled); **green** `FF9BBB59` = *verified* against the bank debit. A fresh card
-  amount is written yellow; reconciliation turns it green. A newer statement re-writes the cell
-  back to yellow **even over green** (`writeCard` no longer guards green); reconciliation never
-  downgrades a green cell. Bank figures are written with **no fill** (no separate transient cue).
+- **Card-cell three-state colour:** **yellow** = *unverified* (fresh from a statement); **green**
+  `FF9BBB59` = *verified* against the bank debit; **amber** (`LIGHT_ORANGE`) = *revised* — a value
+  that was green and got overwritten by a re-processed statement. `writeCard` checks `isVerified`
+  before overwriting: green→**amber**, else→**yellow** (it never guards/blocks the overwrite —
+  newer statement is authoritative). Reconciliation treats amber like yellow (eligible → green) and
+  still skips green. Bank figures are written with **no fill**.
 - **Status (`Control`) sheet is visible** (not hidden), per user preference.
+- **Processed-PDF archive:** on a finalized `complete` run, `Orchestrator.archiveProcessed` moves the
+  cycle's statement PDFs to `workingDir/processed/<run_id>/` (timestamped). Discovery uses
+  `Files.list` (top-level only), so the archive is never re-scanned. PDFs are *not* moved on
+  first-run/`regenerate` (regenerate still needs them).
 - **Mandates** (card → paying bank, payment-identification pattern):
   - `HDFC CC` ← HDFC bank, last-4 `8339`
   - `HDFC RUPAY` ← HDFC bank, last-4 `3787`
@@ -93,6 +108,21 @@ pattern**, and the **password** (Keychain) — those are separate per-account fi
   configured card is **logged and skipped** (not a hard abort). But **two debits matching the same
   card for the same prior month abort** (ambiguous double-payment/reversal), and a debit whose
   prior-month row doesn't exist is **skipped and logged**.
+
+## Domain model (vocabulary)
+
+The core types are small **immutable records** — a quick glossary before the components:
+
+- **`Account`** (+ `AccountType` bank/credit-card) — a configured account; `Rule` — a tagging rule.
+- **`RawBankTxn`** — a transaction as parsed (no account label); **`BankTxn`** — a `RawBankTxn`
+  tagged with its account label; **`TaggedTxn`** — a `BankTxn` + its `Tag`.
+- **`ParsedBankStatement`** (period, last-4, txns, `PrintedTotals`) and **`ParsedCardStatement`**
+  (billing date, `Total Amount Due`).
+- **`MonthlyFigure`** — a bank's per-month `Bank Debits` / `Credits/Transfers` / month / account.
+- **`Tag`** (vocabulary), **`Bucket`** + **`Treatment`** (Sign,Tag → Expense | Credits/Transfers |
+  Ignored), and the workbook verification status (`pending` / `complete` / `regenerate`).
+
+Everything above is pure data; the I/O lives only in `PdfTextExtractor` and `WorkbookService`.
 
 ## Components & boundaries
 
@@ -107,6 +137,7 @@ CLI (args)
        ├─ Parser dispatch (account **format** → per-institution parser; a `switch`)
        │     • BankStatementParser  (HDFC/NIYO/YES) → transactions + period + totals
        │     • CardStatementParser  (HDFC/YES)      → billing date + Total Amount Due
+       ├─ (startup) WorkbookService.duplicateMonthRows → abort if any Month Key appears twice
        ├─ StatementOverlap    → abort if two same-account BANK statements' periods overlap;
        │                        cards abort on a duplicate card+billing-month (both fail-loud)
        ├─ TaggingEngine       → ordered substring rules (first match wins) → tag; defaults
@@ -118,9 +149,15 @@ CLI (args)
        └─ WorkbookService (POI)
 ```
 
-**Boundary discipline:** only `PdfTextExtractor` knows PDF mechanics; only `WorkbookService`
-knows Excel; the middle (tagging, aggregation, reconciliation) is **pure domain logic, no I/O** —
-which is where the business rules live and where unit tests concentrate.
+**Boundary discipline:** two layers, cleanly separated —
+- **Pure computation layer** (stateless, no I/O): `TaggingEngine`, `PinnedOverrides`,
+  `Treatment`/`Bucket`, `Aggregator`, `CardPaymentMatcher`, `Reconciler`, `StatementOverlap`,
+  `StatementBalanceValidator`. This is where the business rules live and where unit tests concentrate.
+- **System services** (the only components that touch the outside world): `PdfTextExtractor` (PDF),
+  `WorkbookService` (Excel), `SecretsProvider` (Keychain), `StatementDiscovery` (filesystem),
+  `ConfigLoader` (YAML).
+
+The computation layer never imports POI/PDF/file APIs, so "the middle" stays trivially testable.
 
 **Card-payment resolution is one shared rule.** `CardPaymentMatcher` (mandate bank + payment
 pattern → card, fail-loud on >1) is used **both** when the Transactions sheet's `System Note` is
@@ -142,11 +179,14 @@ column is derived (never read back) and recomputed on every `regenerate`.
   are **re-applied** (`PinnedOverrides.apply`, by normalized transaction identity) and re-marked
   `TRUE`; the pinned tag is what's used at `complete`. (Pins are date-keyed, so they only matter
   within their own review cycle — no cross-month durability needed.)
-- **Verified-card state** → the **green fill is not cosmetic; it is persisted workbook state**
-  meaning "this card amount was confirmed against the bank debit." Reconciliation reads it back
-  (`isVerified`) to **skip already-verified cells**, so the cell colour is a real part of the data
-  model — not just presentation. (Only a newer *statement* re-opens it; see the card two-state
-  colour above.) Treat it as state, never as decoration.
+- **Verified-card state** → conceptually each card cell carries a logical **`verified` flag**; the
+  **green fill is that flag's presentation, with the Excel fill as its storage medium** (there is no
+  separate boolean — the colour *is* the stored flag). Reconciliation reads it back
+  (`MatrixCellStyles.isGreen` via `isVerified`) to **skip already-verified cells**, so the colour is
+  a real part of the data model, not decoration. The mapping is deliberately one place
+  (`MatrixCellStyles`): `verified → green`, `unverified → yellow`, `revised → amber`. Keeping the
+  colour↔flag translation centralized is what avoids "why is this green?" debugging later. (Only a
+  newer *statement* re-opens a green cell; see the card colour states above.)
 
 ## Parser design
 
@@ -208,13 +248,24 @@ rule can express becomes a **pinned override**.
 
 ## Validation strategy
 
-The parse-correctness guard is a **check against the statement's own printed totals**:
-`opening + Σcredits − Σdebits == closing`. It is **enforced at run time** (`StatementBalanceValidator`,
-called from the Orchestrator): if a bank statement prints opening/closing balances and they don't
-reconcile, the run **aborts** (parse error). A statement that prints no balances is skipped (can't
-be checked). *(This is parse validation — kept deliberately distinct, in name and package, from
-credit-card **reconciliation** in `com.expensetracker.recon`, which matches a card's bill against
-the bank debit.)*
+The system **fails loud** at the earliest point a problem is detectable. The checks are independent
+and live on existing components (not a separate validator framework), grouped by phase:
+
+| Phase | Check | Where |
+|---|---|---|
+| **Config load** | duplicate labels; mandate → unknown bank; active card missing payment pattern | `ConfigLoader.validate` |
+| **Startup** | matrix has no duplicate `Month Key` rows | `WorkbookService.duplicateMonthRows` |
+| **Discovery** | each PDF resolves to exactly one account (0/>1 → abort) | `StatementDiscovery` |
+| **Discovery** | no two same-account bank statements with overlapping periods; no duplicate card+billing-month | `StatementOverlap` (+ Orchestrator card-dup check) |
+| **Parse** | extracted txns reconcile to printed totals (`opening + credits − debits = closing`) | `StatementBalanceValidator` |
+| **Reconciliation** | a `cc-payment` debit matches exactly one card; ≥2 debits for the same card/month → abort | `CardPaymentMatcher` / `Reconciler` |
+
+Two notes on the table:
+- The **parse guard** only applies when a statement actually prints opening/closing balances; one
+  that prints none simply isn't checked this way (it can't be).
+- **Parse validation ≠ reconciliation.** `StatementBalanceValidator` (does the *extraction* add up?)
+  is deliberately separate, in name and package, from credit-card **reconciliation** in
+  `com.expensetracker.recon` (does the *card bill* match the bank debit?).
 
 ## Testing strategy
 
