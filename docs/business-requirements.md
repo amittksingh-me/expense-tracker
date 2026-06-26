@@ -74,6 +74,13 @@ months — the system never auto-generates a rule from a correction. (The `regen
 below, is the path for re-tagging after a config change.) _(The rule storage format is an
 implementation detail, defined later.)_
 
+### Configuration validation
+Before any statement is processed, the system **validates the configuration for internal
+consistency and aborts (fail-loud) on any error**, including: **duplicate account labels**, a
+credit card whose **mandate refers to an unknown bank account**, or an **active (non-skipped) card
+missing its payment-identification pattern**. (PDF-pattern *ambiguity* is not pre-checked — it is
+caught at run time, where a statement file matching more than one account aborts discovery.)
+
 ## The monthly matrix (source of truth, one row per month — NOT a ledger)
 
 Columns, in order (for the current 4-card / 4-bank configuration):
@@ -185,7 +192,8 @@ lands. A pin **survives `regenerate` only while its underlying transaction still
 regenerated statement set**; if a corrected statement no longer contains that transaction, the pin
 naturally disappears (it has nothing to attach to).
 
-**Transaction identity** = `Bank` + `Txn Date` + `Description` + `Amount` + `Sign` (all five —
+**Transient transaction identity** (review-cycle scoped — used only to re-attach pins during a
+rebuild, **not** a persistent ledger key) = `Bank` + `Txn Date` + `Description` + `Amount` + `Sign` (all five —
 `Sign` is required so that an equal-amount debit and credit on the same day do not collide).
 Comparison is normalized: `Description` **whitespace-normalized**, `Amount` to **2 decimal
 places**, and `Txn Date` as a **date only** (no time component).
@@ -227,10 +235,11 @@ Worked example — ₹10,000 moved from Bank 1 → Bank 2 (both the user's accou
   A fresh amount starts **yellow**; reconciliation turns it **green**; re-processing a month that
   was already green turns it **amber**.
 - **A newer statement is authoritative for its card/month:** processing a card statement always
-  (re)writes that month's card cell to the new `Total Amount Due` — **even if the cell was
-  previously green**. If it was green, the rewrite lands as **amber** (revised); otherwise as
-  **yellow**. "Verified" means *confirmed against the bank debit*, not *frozen forever*; a
-  re-issued/corrected statement re-opens the cell for re-reconciliation.
+  (re)writes that month's card cell to the statement's `Total Amount Due` — **regardless of whether
+  the amount actually changes**, and **even if the cell was previously green**. If it was green, the
+  rewrite lands as **amber** (revised); otherwise as **yellow**. "Verified" means *confirmed against
+  the bank debit*, not *frozen forever*; a re-issued/corrected statement re-opens the cell for
+  re-reconciliation.
 - **Reconciliation:** using the **mandate** mapping plus each card's **payment-identification
   pattern**, each credit-card-payment debit in the paying bank's statement is matched to its
   specific card (the **same matching used to write the `System Note`** at processing time, so a
@@ -290,6 +299,8 @@ human verification of the tags first, so they flow through the Transactions shee
    prior month's card column(s) (using the now-verified `cc-payment` debits), **delete the
    Transactions sheet**, and finalize. **After finalization the verification status remains
    `complete`** (it is the no-op guard: status `complete` + no Transactions sheet ⇒ already done).
+   The **absence of the Transactions sheet is authoritative** for "already finalized" — the status
+   value alone is not relied upon, since it can be hand-edited.
    The human then copies the **output** workbook back over the stable workbook as the new version.
    (Re-running once finalized — Transactions sheet already removed — is a **no-op**.)
 4. **Working copy present, status = `regenerate`:** discard the current Transactions sheet,
@@ -298,16 +309,21 @@ human verification of the tags first, so they flow through the Transactions shee
 
 **Credit-card totals are re-imported whenever the review sheet is generated** — i.e. on a
 **first run** and on **`regenerate`** (they are authoritative statement outputs, not part of the
-human tag-review workflow). Each re-import lands in the **unverified (yellow)** state;
-reconciliation greens it. `complete` does **not** re-import cards (it pushes the reviewed bank
-figures and reconciles). Once a workbook is **finalized** (Transactions sheet already removed), a
-re-run is a **no-op regardless of any card PDFs still sitting in the working directory**.
+human tag-review workflow). A re-import of a month whose cell was previously **unverified or blank
+lands as yellow**; a re-import over a **previously-verified (green)** cell lands as **amber**
+(revised) — flagging that an already-trusted value was reprocessed and should be re-verified. This
+is how a corrected/re-issued statement flows back through normal reconciliation. `complete` does
+**not** re-import cards (it pushes the reviewed bank figures and reconciles). Once a workbook is
+**finalized** (Transactions sheet already removed), a re-run is a **no-op regardless of any card
+PDFs still sitting in the working directory**.
 
 **Processed-PDF archival (automatic).** On a successful **`complete`** run (the end of a review
 cycle), the system **moves the cycle's statement PDFs into `workingDir/processed/<run_id>/`** (a
-per-run timestamped subfolder). Only **unprocessed PDFs in the working directory are active
-inputs** — this prevents accidental double-processing and keeps an audit trail. Discovery scans
-the working directory **non-recursively**, so the `processed/` archive is never re-scanned. (PDFs
+per-run timestamped subfolder). PDFs are moved **only after the run succeeds** — if it aborts for
+any reason, **no PDFs are moved**, so the user can fix the problem and re-run on the same inputs.
+Only **unprocessed PDFs in the working directory are active inputs** — this prevents accidental
+double-processing and keeps an audit trail. Discovery scans the working directory
+**non-recursively**, so the `processed/` archive is never re-scanned. (PDFs
 are deliberately **not** moved on first-run/`regenerate`, because `regenerate` still needs them.)
 The output workbook copy is left in place for the human to copy back; once finalized, a further
 `complete` run is a **no-op** (the Transactions sheet is already gone, and the PDFs are archived).
@@ -329,8 +345,9 @@ columns in particular are rewritten **whenever the review sheet is (re)generated
 retain their existing values. If no row exists for that month, a new row is **appended at the
 bottom** — the matrix only grows downward and rows are **never re-sorted** (months are processed in
 order, so the latest is always last; a rare back-filled month also simply appends). **A newly
-appended row carries the same formulas as existing rows in every formula-driven column, adjusted
-for the new row, so workbook calculations continue automatically.**
+appended row carries the same **Excel formulas and cell formatting** as the previous matrix row in
+every formula-driven column, with formulas adjusted for the new row, so workbook calculations
+continue automatically.**
 
 Card cells carry the **three-state colour** described under reconciliation: **yellow (unverified)**
 when freshly written, **green (verified)** once confirmed against the bank debit, and **amber
@@ -362,6 +379,11 @@ transactions reconcile with the statement's own printed totals** — `opening + 
 closing`. If a statement prints opening/closing balances and they **do not** reconcile, extraction
 dropped or added rows: this is a **parse error and aborts the run** (never partial/incorrect data).
 A statement that prints **no** balances cannot be checked this way and is not failed on this basis.
+
+**Matrix integrity (duplicate month rows).** The matrix must hold **at most one row per `Month
+Key`**. At **startup**, the system scans the matrix; if any month appears in **more than one** row
+(only possible from manual editing / a corrupted workbook — the system itself never creates
+duplicates), the run **aborts** rather than guess which row to update.
 
 **Statements are assumed complete for the issuer's normal period.** A bank statement is taken to
 cover one whole statement period; partial exports or fragments (e.g. `01-Apr–15-Apr`) are not

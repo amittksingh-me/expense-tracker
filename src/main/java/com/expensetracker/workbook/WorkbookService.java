@@ -29,7 +29,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -211,6 +214,32 @@ public final class WorkbookService implements AutoCloseable {
     public void registerBank(String label) {
         int debits = findInRow(sheet.getRow(BANK_GROUP_ROW), label);
         bankCols.put(label, new int[]{debits, debits + 1, debits + 2});
+    }
+
+    /**
+     * Month Keys that appear in more than one matrix data row. The matrix must hold at most one row
+     * per month; duplicates mean the workbook was hand-edited/corrupted, and writing would silently
+     * update only one of them — callers should abort (fail-loud).
+     */
+    public List<LocalDate> duplicateMonthRows() {
+        Map<LocalDate, Integer> counts = new LinkedHashMap<>();
+        for (int r = FIRST_DATA_ROW; r <= sheet.getLastRowNum(); r++) {
+            Row row = sheet.getRow(r);
+            if (row == null) {
+                continue;
+            }
+            Cell c = row.getCell(dateCol);
+            if (c != null && c.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(c)) {
+                counts.merge(c.getLocalDateTimeCellValue().toLocalDate(), 1, Integer::sum);
+            }
+        }
+        List<LocalDate> dups = new ArrayList<>();
+        counts.forEach((month, n) -> {
+            if (n > 1) {
+                dups.add(month);
+            }
+        });
+        return dups;
     }
 
     /** Find the data row for an end-of-month date, or -1. */

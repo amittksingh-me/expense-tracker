@@ -84,6 +84,14 @@ public final class Orchestrator {
             config.banks().forEach(b -> wb.registerBank(b.label()));
             config.cards().forEach(c -> wb.registerCard(c.label()));
 
+            // Integrity guard: the matrix must hold at most one row per month. Duplicates mean the
+            // workbook was hand-edited/corrupted; writing would silently update only one — fail loud.
+            List<LocalDate> dupMonths = wb.duplicateMonthRows();
+            if (!dupMonths.isEmpty()) {
+                throw new IllegalStateException("Matrix has duplicate Month Key rows for " + dupMonths
+                        + " — at most one row per month is allowed; fix the workbook and re-run.");
+            }
+
             if (firstRun) {
                 log.info("first run (no working copy) — generating review surface");
                 generatePending(wb, matches, List.of());

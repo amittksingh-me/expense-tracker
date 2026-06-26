@@ -9,8 +9,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** Loads {@link AppConfig} from a YAML file. Fails loud on malformed config. */
 public final class ConfigLoader {
@@ -62,7 +64,36 @@ public final class ConfigLoader {
                     Tag.valueOf(str(m, "tag").toUpperCase())));
         }
 
-        return new AppConfig(service, masterSheet, input, output, workingDir, accounts, rules);
+        AppConfig config = new AppConfig(service, masterSheet, input, output, workingDir, accounts, rules);
+        validate(config);
+        return config;
+    }
+
+    /**
+     * Up-front configuration validation (fail-loud before any statement is processed): duplicate
+     * account labels, a card's mandate referring to an unknown bank, or an active card missing its
+     * payment-identification pattern. (PDF-pattern ambiguity is left to discovery, which aborts at
+     * run time when a file matches more than one account.)
+     */
+    static void validate(AppConfig c) {
+        Set<String> labels = new HashSet<>();
+        for (Account a : c.accounts()) {
+            if (!labels.add(a.label())) {
+                throw new IllegalArgumentException("Duplicate account label: '" + a.label() + "'");
+            }
+        }
+        Set<String> bankLabels = new HashSet<>();
+        c.banks().forEach(b -> bankLabels.add(b.label()));
+        for (Account card : c.cards()) {
+            if (card.mandateBank() == null || !bankLabels.contains(card.mandateBank())) {
+                throw new IllegalArgumentException("Card '" + card.label() + "' mandateBank '"
+                        + card.mandateBank() + "' is not a configured bank account");
+            }
+            if (!card.skip() && (card.paymentPattern() == null || card.paymentPattern().isBlank())) {
+                throw new IllegalArgumentException("Card '" + card.label()
+                        + "' is missing a payment-identification pattern");
+            }
+        }
     }
 
     private static String str(Map<String, Object> m, String key) {

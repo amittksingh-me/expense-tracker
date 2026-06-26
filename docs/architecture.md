@@ -46,7 +46,10 @@
 ## Configuration & secrets
 
 - **Config in YAML** (Jackson or SnakeYAML): accounts, mandates, paths (+ master sheet name),
-  and the ordered tagging rules. Parsed into typed records, validated up front (fail-loud).
+  and the ordered tagging rules. Parsed into typed records, **validated up front (fail-loud)** in
+  `ConfigLoader.validate`: duplicate labels, a card mandate → unknown bank, or an active card
+  missing its payment pattern. (PDF-pattern ambiguity is left to discovery's run-time multi-match
+  abort.)
 - **Passwords never live in config.** A `SecretsProvider` fetches each statement password from
   the **macOS Keychain** via the `security` CLI on demand (never logged).
 
@@ -112,6 +115,7 @@ CLI (args)
        ├─ Parser dispatch (account **format** → per-institution parser; a `switch`)
        │     • BankStatementParser  (HDFC/NIYO/YES) → transactions + period + totals
        │     • CardStatementParser  (HDFC/YES)      → billing date + Total Amount Due
+       ├─ (startup) WorkbookService.duplicateMonthRows → abort if any Month Key appears twice
        ├─ StatementOverlap    → abort if two same-account BANK statements' periods overlap;
        │                        cards abort on a duplicate card+billing-month (both fail-loud)
        ├─ TaggingEngine       → ordered substring rules (first match wins) → tag; defaults

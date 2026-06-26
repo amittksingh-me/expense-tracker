@@ -157,6 +157,25 @@ class WorkbookServiceAcceptanceTest {
     }
 
     @Test
+    void detectsDuplicateMonthRows() throws Exception {
+        try (Workbook wb = synthetic()) {
+            WorkbookService svc = open(wb);
+            assertTrue(svc.duplicateMonthRows().isEmpty());   // only the single seed row
+
+            // add a second data row with the same Month Key as the seed (2026-01-01)
+            Sheet s = wb.getSheet(SHEET);
+            CellStyle dateStyle = wb.createCellStyle();
+            dateStyle.setDataFormat(wb.createDataFormat().getFormat("dd-mmm-yyyy"));
+            Row dup = s.createRow(FIRST_DATA + 1);
+            Cell d = dup.createCell(DATE);
+            d.setCellValue(LocalDate.of(2026, 1, 1));
+            d.setCellStyle(dateStyle);
+
+            assertEquals(List.of(LocalDate.of(2026, 1, 1)), svc.duplicateMonthRows());
+        }
+    }
+
+    @Test
     void transactionsAndStatusRoundTrip() throws Exception {
         try (Workbook wb = synthetic()) {
             WorkbookService svc = open(wb);
