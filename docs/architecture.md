@@ -40,7 +40,8 @@
   - read the master matrix, the `Control` status, and the Transactions sheet (incl. its pinned rows);
   - write/refresh the Transactions sheet;
   - **upsert** month rows — write only system-owned cells, **preserve native formulas and the
-    manual `Comments`**, apply cell-fill **visual cues**;
+    manual `Comments`**, apply cell-fill **visual cues**; an **append copies the previous row**
+    (styles + formulas, references shifted) so customizations propagate (see below);
   - `setForceFormulaRecalculation(true)` so year-scoped Median/Average refresh on open;
   - on `regenerate`, carry pinned rows over in place; delete the Transactions sheet on `complete`.
 
@@ -89,9 +90,14 @@ fetches it to open and re-save the workbook).
 - **Month row key:** the workbook uses **1st-of-month** dates (`01-May-2026`), not end-of-month.
   (Older 2025 rows use end-of-month; new appends follow the current 2026 convention.)
 - **Cell formats (match the existing sheet):** dates `[$-809]dd mmmm yyyy`; amounts `"₹"#,##0.00`.
-  New rows **clone their cell styles from an existing data row** (and the verified-green style
-  from an existing green cell), so font/size (14), number format, and the exact green shade all
-  match — rather than building styles from scratch.
+  An **appended row is built by copying the previous data row** (POI `XSSFSheet.copyRows`), which
+  duplicates its cell styles **and its formulas with references shifted to the new row** — so
+  font/size (14), number format, fills, and any **hand-customized formula** (e.g. a `Net Expenses`
+  with an extra term or a cross-sheet reference) all carry forward. The system then overwrites only
+  the system-owned input cells and **blanks `Comments`** (and any account with no statement this run
+  stays blank). The verified-green style is cloned from an existing green cell so the exact shade
+  matches. *(Only the very first row of an empty matrix has no row to copy — there styles are cloned
+  from the reference row and the canonical formulas are constructed from scratch.)*
 - **Card-cell three-state colour:** **yellow** = *unverified* (fresh from a statement); **green**
   `FF9BBB59` = *verified* against the bank debit; **amber** (`LIGHT_ORANGE`) = *revised* — a value
   that was green and got overwritten by a re-processed statement. `writeCard` checks `isVerified`

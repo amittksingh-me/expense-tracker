@@ -17,7 +17,7 @@ import java.util.Map;
  * Builds and caches the matrix cell styles and detects the verified-green fill — the single place
  * that knows the card-cell colour conventions:
  * <ul>
- *   <li><b>base</b> — no fill; keeps the reference row's font/number-format (for bank figures + formulas);
+ *   <li><b>base</b> — mirrors the reference row's font, number format, borders, and fill (for bank figures + formulas);
  *   <li><b>unverified</b> — light yellow (fresh card amount, not yet reconciled);
  *   <li><b>amber</b> — light orange (a previously-verified value overwritten by a newer statement);
  *   <li><b>verified</b> — green (confirmed against the bank debit), cloned from an existing green

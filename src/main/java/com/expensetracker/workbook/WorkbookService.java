@@ -7,6 +7,7 @@ import org.apache.poi.poifs.crypt.EncryptionMode;
 import org.apache.poi.poifs.crypt.Encryptor;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellCopyPolicy;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -14,6 +15,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
@@ -59,6 +61,7 @@ public final class WorkbookService implements AutoCloseable {
     private final int colMedian;
     private final int colYear;
     private final int colAverage;
+    private final int colComments;                           // manual column; -1 if the sheet has none
     private final MatrixCellStyles styles;                   // builds/caches base/yellow/amber/green + green detection
 
     private WorkbookService(Workbook wb, String masterSheet) {
@@ -74,6 +77,7 @@ public final class WorkbookService implements AutoCloseable {
         this.colMedian = findInRow(header, "Median Expense");
         this.colYear = findInRow(header, "Year");
         this.colAverage = findInRow(header, "Average Expense");
+        this.colComments = findOptional(header, "Comments");
 
         // all bank triplets (by "Bank Debits" sub-headers) → net cols for the Net Bank formula
         java.util.List<Integer> nets = new java.util.ArrayList<>();
@@ -186,7 +190,9 @@ public final class WorkbookService implements AutoCloseable {
         c.setCellStyle(wasVerified ? styles.amber(col) : styles.unverified(col));
     }
 
-    /** Write a bank's monthly figures (Bank Debits, Credits/Transfers, Net formula). */
+    /** Write a bank's monthly figures — only the system-owned inputs (Bank Debits + Credits/Transfers).
+     *  The Net Expenses column is a formula, inherited from the row above (or constructed on a
+     *  first-ever row); writeBank never touches it, so a hand-customized Net formula is preserved. */
     public void writeBank(String bankLabel, LocalDate eom, MonthlyFigure f) {
         int[] cols = bankCols.get(bankLabel);
         if (cols == null) {
@@ -195,10 +201,6 @@ public final class WorkbookService implements AutoCloseable {
         int r = ensureRow(eom);
         setNumber(r, cols[0], f.bankDebits());
         setNumber(r, cols[1], f.creditsTransfers());
-        // Net Expenses as a live formula = debits - credits
-        Cell net = cell(r, cols[2]);
-        net.setCellFormula(colLetter(cols[0]) + (r + 1) + "-" + colLetter(cols[1]) + (r + 1));
-        net.setCellStyle(styles.base(cols[2]));
     }
 
     /** Reconciliation: set a prior month's card column to the actual amount, highlighted. Returns old value or null. */
@@ -304,12 +306,48 @@ public final class WorkbookService implements AutoCloseable {
         if (r >= 0) {
             return r;
         }
-        r = lastDataRow() + 1;
-        Cell date = cell(r, dateCol);
-        date.setCellValue(eom);
-        date.setCellStyle(styles.base(dateCol));
-        writeDerivedFormulas(r);
+        int src = lastDataRow();
+        r = src + 1;
+        if (src >= FIRST_DATA_ROW) {
+            inheritRowFrom(src, r);          // carry the previous row's formatting + formulas (refs shifted)
+        } else {
+            cell(r, dateCol).setCellStyle(styles.base(dateCol));
+            writeDerivedFormulas(r);         // first-ever row: construct the canonical formulas
+        }
+        cell(r, dateCol).setCellValue(eom);
         return r;
+    }
+
+    /**
+     * Append a new month by copying the previous data row — its **formatting and its formula columns
+     * (with Excel references shifted to the new row)** — so any hand-customized formulas carry forward.
+     * Then clear the system-owned input cells and Comments, so this month starts blank and only the
+     * accounts processed in this run get values (missing accounts stay blank).
+     */
+    private void inheritRowFrom(int src, int dest) {
+        CellCopyPolicy policy = new CellCopyPolicy.Builder()
+                .cellValue(true).cellStyle(true).cellFormula(true)
+                .mergedRegions(false).rowHeight(true).build();
+        ((XSSFSheet) sheet).copyRows(List.of(sheet.getRow(src)), dest, policy);
+        for (int col : cardCol.values()) {
+            blank(dest, col);
+        }
+        for (int[] cols : bankCols.values()) {
+            blank(dest, cols[0]);
+            blank(dest, cols[1]);
+        }
+        if (colComments >= 0) {
+            blank(dest, colComments);
+        }
+    }
+
+    /** Clear a cell's content but keep its style (so column formatting is preserved). */
+    private void blank(int r, int col) {
+        Row row = sheet.getRow(r);
+        Cell c = row == null ? null : row.getCell(col);
+        if (c != null) {
+            c.setBlank();
+        }
     }
 
     private int lastDataRow() {
@@ -329,6 +367,11 @@ public final class WorkbookService implements AutoCloseable {
 
     private void writeDerivedFormulas(int r) {
         int e = r + 1; // 1-based Excel row
+        // per-bank Net Expenses = Bank Debits − Credits/Transfers (canonical; net col = debits+2)
+        for (int netCol : allBankNetCols) {
+            cell(r, netCol).setCellFormula(colLetter(netCol - 2) + e + "-" + colLetter(netCol - 1) + e);
+            cell(r, netCol).setCellStyle(styles.base(netCol));
+        }
         // Net Bank Expenses = sum of bank net cols
         StringBuilder net = new StringBuilder();
         for (int i = 0; i < allBankNetCols.length; i++) {
@@ -411,6 +454,16 @@ public final class WorkbookService implements AutoCloseable {
             }
         }
         throw new IllegalStateException("Header not found in row " + row.getRowNum() + ": '" + header + "'");
+    }
+
+    /** Like {@link #findInRow} but returns -1 instead of throwing when the header is absent. */
+    private static int findOptional(Row row, String header) {
+        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+            if (header.equalsIgnoreCase(cellString(row, c).trim())) {
+                return c;
+            }
+        }
+        return -1;
     }
 
     private static String cellString(Row row, int c) {
