@@ -78,12 +78,17 @@ pattern**, and the **password** (Keychain) — those are separate per-account fi
   New rows **clone their cell styles from an existing data row** (and the verified-green style
   from an existing green cell), so font/size (14), number format, and the exact green shade all
   match — rather than building styles from scratch.
-- **Card-cell two-state colour:** **yellow** fill = *unverified* (written from a card statement,
-  not yet reconciled); **green** `FF9BBB59` = *verified* against the bank debit. A fresh card
-  amount is written yellow; reconciliation turns it green. A newer statement re-writes the cell
-  back to yellow **even over green** (`writeCard` no longer guards green); reconciliation never
-  downgrades a green cell. Bank figures are written with **no fill** (no separate transient cue).
+- **Card-cell three-state colour:** **yellow** = *unverified* (fresh from a statement); **green**
+  `FF9BBB59` = *verified* against the bank debit; **amber** (`LIGHT_ORANGE`) = *revised* — a value
+  that was green and got overwritten by a re-processed statement. `writeCard` checks `isVerified`
+  before overwriting: green→**amber**, else→**yellow** (it never guards/blocks the overwrite —
+  newer statement is authoritative). Reconciliation treats amber like yellow (eligible → green) and
+  still skips green. Bank figures are written with **no fill**.
 - **Status (`Control`) sheet is visible** (not hidden), per user preference.
+- **Processed-PDF archive:** on a finalized `complete` run, `Orchestrator.archiveProcessed` moves the
+  cycle's statement PDFs to `workingDir/processed/<run_id>/` (timestamped). Discovery uses
+  `Files.list` (top-level only), so the archive is never re-scanned. PDFs are *not* moved on
+  first-run/`regenerate` (regenerate still needs them).
 - **Mandates** (card → paying bank, payment-identification pattern):
   - `HDFC CC` ← HDFC bank, last-4 `8339`
   - `HDFC RUPAY` ← HDFC bank, last-4 `3787`

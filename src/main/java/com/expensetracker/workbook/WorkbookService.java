@@ -65,6 +65,7 @@ public final class WorkbookService implements AutoCloseable {
     private final CellStyle verifiedStyle;
     private final Map<Integer, CellStyle> baseCache = new HashMap<>();
     private final Map<Integer, CellStyle> unverifiedCache = new HashMap<>();
+    private final Map<Integer, CellStyle> amberCache = new HashMap<>();
 
     private WorkbookService(Workbook wb, String masterSheet) {
         this.wb = wb;
@@ -121,6 +122,21 @@ public final class WorkbookService implements AutoCloseable {
             CellStyle s = wb.createCellStyle();
             s.cloneStyleFrom(baseStyleFor(c));
             s.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+            s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            return s;
+        });
+    }
+
+    /**
+     * Base style for {@code col} plus an amber fill — the <b>revised</b> card state: a value that
+     * was previously <b>verified (green)</b> and has now been overwritten by a newer statement.
+     * Flags "a trusted value changed" for human attention; reconciliation re-greens it like yellow.
+     */
+    private CellStyle amberStyleFor(int col) {
+        return amberCache.computeIfAbsent(col, c -> {
+            CellStyle s = wb.createCellStyle();
+            s.cloneStyleFrom(baseStyleFor(c));
+            s.setFillForegroundColor(IndexedColors.LIGHT_ORANGE.getIndex());
             s.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             return s;
         });
@@ -222,12 +238,14 @@ public final class WorkbookService implements AutoCloseable {
             throw new IllegalStateException("Card column not registered: " + cardLabel);
         }
         int r = ensureRow(eom);
-        // A newly processed statement is authoritative for that card/month: it overwrites any
-        // prior value (including a previously-verified green cell) and lands as unverified (yellow)
-        // until reconciliation confirms it against the bank debit.
+        // A newly processed statement is authoritative for that card/month: it overwrites any prior
+        // value. If the prior value was verified (green), reprocessing it lands as **amber**
+        // ("a trusted value changed — review me"); otherwise it lands as unverified (yellow).
+        // Either way reconciliation can later confirm it against the bank debit (→ green).
+        boolean wasVerified = isVerified(r, col);
         Cell c = cell(r, col);
         c.setCellValue(total.doubleValue());
-        c.setCellStyle(unverifiedStyleFor(col));
+        c.setCellStyle(wasVerified ? amberStyleFor(col) : unverifiedStyleFor(col));
     }
 
     /** Write a bank's monthly figures (Bank Debits, Credits/Transfers, Net formula). */

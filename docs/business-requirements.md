@@ -111,7 +111,7 @@ formulas**, never written as static values.
 > columns** and each bank's **`Bank Debits`** and **`Credits/Transfers`**. Everything else in the
 > matrix is either **formula-driven** (the derived columns above) or **manual** (`Comments`). The
 > system overwrites system-owned cells on its runs; it never writes the formula or manual cells.
-> The **card-cell verification colour (yellow/green) is also system-owned formatting** — it is set
+> The **card-cell verification colour (yellow/green/amber) is also system-owned formatting** — it is set
 > by the system and may be overwritten on later runs, so it should not be hand-edited.
 
 ## Bank-account transaction processing — **bank accounts only**
@@ -215,16 +215,22 @@ Worked example — ₹10,000 moved from Bank 1 → Bank 2 (both the user's accou
   later (~7-Jul).
 - The card column holds the statement total as a **provisional** figure, shown in the
   **unverified (yellow)** state until reconciliation confirms it.
-- **Card amount states (visual):** a card cell is either **unverified (yellow)** — taken straight
-  from a card statement, not yet confirmed against the bank payment — or **verified (green)** —
-  confirmed against the corresponding bank debit and therefore trusted. A fresh card amount starts
-  yellow; reconciliation turns it green. This two-state colour is the card column's **only**
-  highlight (there is no separate transient "overwrite" cue).
+- **Card amount states (visual) — three states:**
+  - **Unverified (yellow):** a fresh card amount taken straight from a statement, not yet confirmed
+    against the bank payment.
+  - **Verified (green):** confirmed against the corresponding bank debit and therefore trusted.
+  - **Revised (amber):** a value that was **previously verified (green)** and has now been
+    **overwritten by a newer/re-processed statement**. Amber does **not** mean untrusted — it means
+    *a trusted value changed*, flagging it for human attention. Reconciliation treats amber like
+    yellow (eligible) and turns it green again once confirmed.
+
+  A fresh amount starts **yellow**; reconciliation turns it **green**; re-processing a month that
+  was already green turns it **amber**.
 - **A newer statement is authoritative for its card/month:** processing a card statement always
-  (re)writes that month's card cell to the new `Total Amount Due` in the **unverified (yellow)**
-  state — **even if the cell was previously green**. "Verified" means *confirmed against the bank
-  debit*, not *frozen forever*; a re-issued/corrected statement re-opens the cell for
-  re-reconciliation.
+  (re)writes that month's card cell to the new `Total Amount Due` — **even if the cell was
+  previously green**. If it was green, the rewrite lands as **amber** (revised); otherwise as
+  **yellow**. "Verified" means *confirmed against the bank debit*, not *frozen forever*; a
+  re-issued/corrected statement re-opens the cell for re-reconciliation.
 - **Reconciliation:** using the **mandate** mapping plus each card's **payment-identification
   pattern**, each credit-card-payment debit in the paying bank's statement is matched to its
   specific card (the **same matching used to write the `System Note`** at processing time, so a
@@ -232,9 +238,9 @@ Worked example — ₹10,000 moved from Bank 1 → Bank 2 (both the user's accou
   month** column (reconciliation looks only one month back — it does not search further). If they differ
   (refund/adjustment), the **prior month's card column is updated** to the actual amount; the
   verified cell is marked **green** so the human can trust it. **Reconciliation operates only on
-  unverified (yellow) card cells; verified (green) cells are ignored. A newer statement rewrites
-  the cell in yellow (see above), which makes it eligible for reconciliation again.** (User may
-  note the delta in `Comments` manually.)
+  unverified (yellow) or revised (amber) card cells; verified (green) cells are ignored. A newer
+  statement rewrites the cell in yellow/amber (see above), which makes it eligible for
+  reconciliation again.** (User may note the delta in `Comments` manually.)
 - If a `cc-payment` debit matches **more than one** card's payment-identification pattern,
   reconciliation **aborts** (fail-loud) rather than guessing. A debit matching **zero** cards is
   **logged and skipped** (e.g. an intentionally-ignored card), not an error.
@@ -297,10 +303,14 @@ reconciliation greens it. `complete` does **not** re-import cards (it pushes the
 figures and reconciles). Once a workbook is **finalized** (Transactions sheet already removed), a
 re-run is a **no-op regardless of any card PDFs still sitting in the working directory**.
 
-**Working-directory cleanup is currently a manual human step.** After copying the finalized
-workbook back to the main folder, the human clears the working directory (the output copy +
-processed PDFs). Until it is cleared, re-running is harmless — once finalized, a further
-`complete` run is a **no-op** (the Transactions sheet is already gone).
+**Processed-PDF archival (automatic).** On a successful **`complete`** run (the end of a review
+cycle), the system **moves the cycle's statement PDFs into `workingDir/processed/<run_id>/`** (a
+per-run timestamped subfolder). Only **unprocessed PDFs in the working directory are active
+inputs** — this prevents accidental double-processing and keeps an audit trail. Discovery scans
+the working directory **non-recursively**, so the `processed/` archive is never re-scanned. (PDFs
+are deliberately **not** moved on first-run/`regenerate`, because `regenerate` still needs them.)
+The output workbook copy is left in place for the human to copy back; once finalized, a further
+`complete` run is a **no-op** (the Transactions sheet is already gone, and the PDFs are archived).
 
 ### Re-processing an existing month (upsert)
 Month rows are keyed by the `Month Key`, which **uniquely identifies a matrix row — at most one
@@ -308,8 +318,8 @@ row may exist for a given month**. When processing data for a month, the system 
 existing row if present, otherwise appends a new one** (never producing a duplicate). Because the
 system always works on a **copy** (never master), re-processing is safe rather than something to
 prevent. On overwrite, the system rewrites its system-owned cells (a re-written **card** cell
-re-enters the **unverified/yellow** state — itself the cue that it awaits re-reconciliation;
-**bank** figures carry no separate highlight). The override touches **only system-owned cells** —
+re-enters the **unverified/yellow** state — or **amber** if it was previously verified (green) —
+itself the cue that it awaits re-reconciliation; **bank** figures carry no separate highlight). The override touches **only system-owned cells** —
 the card totals and each bank's `Bank Debits` / `Credits/Transfers` — and **never** the manual
 `Comments` or the formula columns. These system-owned cells are **authoritative outputs —
 overwritten regardless of any manual edits** (manual notes belong only in `Comments`); credit-card
@@ -322,10 +332,11 @@ order, so the latest is always last; a rare back-filled month also simply append
 appended row carries the same formulas as existing rows in every formula-driven column, adjusted
 for the new row, so workbook calculations continue automatically.**
 
-Card cells carry the **two-state colour** described under reconciliation: **yellow (unverified)**
-when written from a statement, **green (verified)** once confirmed against the bank debit.
-Reconciliation never downgrades a green cell, but a **newer statement** re-opens it to yellow.
-There is **no separate transient overwrite highlight** — bank figures are written with no fill.
+Card cells carry the **three-state colour** described under reconciliation: **yellow (unverified)**
+when freshly written, **green (verified)** once confirmed against the bank debit, and **amber
+(revised)** when a newer statement overwrites a previously-green value. Reconciliation never
+downgrades a green cell, but a **newer statement** re-opens it (→ amber). There is **no separate
+transient overwrite highlight** — bank figures are written with no fill.
 
 ### Error handling
 The process favours **failing loudly** over guessing. If a statement PDF matches **no** account

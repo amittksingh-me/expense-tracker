@@ -8,6 +8,7 @@ import com.expensetracker.tag.TaggedTxn;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -95,6 +96,20 @@ class WorkbookServiceAcceptanceTest {
         throw new AssertionError("no row for " + month);
     }
 
+    /** Indexed fill colour of a month's cell in {@code col}. */
+    private static short fill(Workbook wb, LocalDate month, int col) {
+        Sheet s = wb.getSheet(SHEET);
+        for (int r = FIRST_DATA; r <= s.getLastRowNum(); r++) {
+            Row row = s.getRow(r);
+            Cell d = row == null ? null : row.getCell(DATE);
+            if (d != null && d.getCellType() == CellType.NUMERIC
+                    && d.getLocalDateTimeCellValue().toLocalDate().equals(month)) {
+                return row.getCell(col).getCellStyle().getFillForegroundColor();
+            }
+        }
+        throw new AssertionError("no row for " + month);
+    }
+
     @Test
     void writesCardsAndBanks_andUpsertsOneRowPerMonth() throws Exception {
         LocalDate may = LocalDate.of(2026, 5, 1);
@@ -129,9 +144,11 @@ class WorkbookServiceAcceptanceTest {
             assertNull(svc.reconcileCard("YES CC", apr, new BigDecimal("470.00")));
             assertEquals(480.0, num(wb, apr, YESCC));
 
-            // a newer statement is authoritative — overwrites even the green cell (back to unverified)
+            // a newer statement is authoritative — overwrites even the green cell; because it WAS
+            // verified, the revised value lands as amber (not yellow) to flag "a trusted value changed"
             svc.writeCard("YES CC", apr, new BigDecimal("450.00"));
             assertEquals(450.0, num(wb, apr, YESCC));
+            assertEquals((int) IndexedColors.LIGHT_ORANGE.getIndex(), (int) fill(wb, apr, YESCC));
             // ...and because it is unverified again, reconciliation now acts on it
             BigDecimal old2 = svc.reconcileCard("YES CC", apr, new BigDecimal("440.00"));
             assertNotNull(old2);
