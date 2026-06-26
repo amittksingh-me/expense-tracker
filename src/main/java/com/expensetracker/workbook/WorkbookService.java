@@ -35,9 +35,10 @@ import java.util.Map;
  *
  * <p>Columns are discovered from the header rows (row 1 = bank-group labels; row 2 = "Date",
  * card labels, and the per-bank Bank Debits/Credits/Net sub-headers), so the layout is not
- * hard-coded. Month rows are keyed by end-of-month date. The system writes only its own input
- * cells (card totals + each bank's Bank Debits/Credits) and keeps the derived columns as live
- * Excel formulas; overwrites get a highlight cue.
+ * hard-coded. Month rows are keyed by the Month Key (first day of the calendar month). The system
+ * writes only its own input cells (card totals + each bank's Bank Debits/Credits) and keeps the
+ * derived columns as live Excel formulas. Card cells carry a three-state fill (yellow = unverified,
+ * green = verified, amber = revised); bank cells get no fill.
  */
 public final class WorkbookService implements AutoCloseable {
 
