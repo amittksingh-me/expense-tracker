@@ -8,6 +8,7 @@ import com.expensetracker.tag.TaggedTxn;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -98,16 +99,43 @@ class WorkbookServiceAcceptanceTest {
 
     /** Indexed fill colour of a month's cell in {@code col}. */
     private static short fill(Workbook wb, LocalDate month, int col) {
+        return cellAt(wb, month, col).getCellStyle().getFillForegroundColor();
+    }
+
+    private static Cell cellAt(Workbook wb, LocalDate month, int col) {
         Sheet s = wb.getSheet(SHEET);
         for (int r = FIRST_DATA; r <= s.getLastRowNum(); r++) {
             Row row = s.getRow(r);
             Cell d = row == null ? null : row.getCell(DATE);
             if (d != null && d.getCellType() == CellType.NUMERIC
                     && d.getLocalDateTimeCellValue().toLocalDate().equals(month)) {
-                return row.getCell(col).getCellStyle().getFillForegroundColor();
+                return row.getCell(col);
             }
         }
         throw new AssertionError("no row for " + month);
+    }
+
+    @Test
+    void appendedRowInheritsColumnFillFromPriorRow() throws Exception {
+        int NET_BANK = 9;   // a derived/formula column in the synthetic layout
+        try (Workbook wb = synthetic()) {
+            // shade the seed row's Net Bank Expenses cell (like a column with a background in the real sheet)
+            Sheet s = wb.getSheet(SHEET);
+            CellStyle shaded = wb.createCellStyle();
+            shaded.setFillForegroundColor(IndexedColors.LIGHT_ORANGE.getIndex());
+            shaded.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            s.getRow(FIRST_DATA).createCell(NET_BANK).setCellStyle(shaded);
+
+            // append a NEW month → its derived cells are written via base(col)
+            WorkbookService svc = open(wb);
+            svc.writeBank("HDFC", LocalDate.of(2026, 2, 1), new MonthlyFigure("HDFC",
+                    YearMonth.of(2026, 2), new BigDecimal("100.00"), new BigDecimal("10.00")));
+
+            // the appended Net Bank Expenses cell must keep the prior row's solid fill (not NO_FILL)
+            CellStyle appended = cellAt(wb, LocalDate.of(2026, 2, 1), NET_BANK).getCellStyle();
+            assertEquals(FillPatternType.SOLID_FOREGROUND, appended.getFillPattern());
+            assertEquals(IndexedColors.LIGHT_ORANGE.getIndex(), appended.getFillForegroundColor());
+        }
     }
 
     @Test
