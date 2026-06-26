@@ -44,16 +44,19 @@ final class MatrixCellStyles {
         this.verifiedStyle = buildVerified(firstDataRow);
     }
 
-    /** Style for {@code col} cloned from the reference row (font/number format), fill removed. */
+    /**
+     * Style for {@code col} cloned from the reference row's cell in that column — so an appended row
+     * keeps the existing rows' **font, number format, borders, and background fill** (column shading).
+     * (Card columns never use this directly; they overlay yellow/amber/green on top.)
+     */
     CellStyle base(int col) {
         return baseCache.computeIfAbsent(col, c -> {
             CellStyle s = wb.createCellStyle();
             Row rr = refRow >= 0 ? sheet.getRow(refRow) : null;
             Cell ref = rr == null ? null : rr.getCell(c);
             if (ref != null) {
-                s.cloneStyleFrom(ref.getCellStyle());
+                s.cloneStyleFrom(ref.getCellStyle());   // preserves fill/borders/format of the row above
             }
-            s.setFillPattern(FillPatternType.NO_FILL);
             s.setWrapText(false);
             return s;
         });
