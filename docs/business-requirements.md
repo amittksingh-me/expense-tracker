@@ -117,9 +117,9 @@ formulas**, never written as static values.
 > **Definition — "system-owned cells":** the raw-input cells the system writes — the **credit-card
 > columns** and each bank's **`Bank Debits`** and **`Credits/Transfers`**. Everything else in the
 > matrix is either **formula-driven** (the derived columns above) or **manual** (`Comments`). The
-> system overwrites system-owned cells on its runs; it never writes the formula or manual cells.
+> system updates system-owned cells on its runs; it never writes the formula or manual cells.
 > The **card-cell verification colour (yellow/green/amber) is also system-owned formatting** — it is set
-> by the system and may be overwritten on later runs, so it should not be hand-edited.
+> by the system and may be updated on later runs, so it should not be hand-edited.
 
 ## Bank-account transaction processing — **bank accounts only**
 
@@ -228,16 +228,16 @@ Worked example — ₹10,000 moved from Bank 1 → Bank 2 (both the user's accou
     against the bank payment.
   - **Verified (green):** confirmed against the corresponding bank debit and therefore trusted.
   - **Revised (amber):** a value that was **previously verified (green)** and has now been
-    **overwritten by a newer/re-processed statement**. Amber does **not** mean untrusted — it means
+    **updated by a newer/re-processed statement**. Amber does **not** mean untrusted — it means
     *a trusted value changed*, flagging it for human attention. Reconciliation treats amber like
     yellow (eligible) and turns it green again once confirmed.
 
   A fresh amount starts **yellow**; reconciliation turns it **green**; re-processing a month that
   was already green turns it **amber**.
 - **A newer statement is authoritative for its card/month:** processing a card statement always
-  (re)writes that month's card cell to the statement's `Total Amount Due` — **regardless of whether
+  updates that month's card cell to the statement's `Total Amount Due` — **regardless of whether
   the amount actually changes**, and **even if the cell was previously green**. If it was green, the
-  rewrite lands as **amber** (revised); otherwise as **yellow**. "Verified" means *confirmed against
+  update lands as **amber** (revised); otherwise as **yellow**. "Verified" means *confirmed against
   the bank debit*, not *frozen forever*; a re-issued/corrected statement re-opens the cell for
   re-reconciliation.
 - **Reconciliation:** using the **mandate** mapping plus each card's **payment-identification
@@ -245,10 +245,10 @@ Worked example — ₹10,000 moved from Bank 1 → Bank 2 (both the user's accou
   specific card (the **same matching used to write the `System Note`** at processing time, so a
   payment's card is resolved by one shared rule) and compared to that card's **immediately prior
   month** column (reconciliation looks only one month back — it does not search further). If they differ
-  (refund/adjustment), the **prior month's system-owned card cell is updated** to the actual amount; the
-  verified cell is marked **green** so the human can trust it. **Reconciliation operates only on
-  unverified (yellow) or revised (amber) card cells; verified (green) cells are ignored. A newer
-  statement rewrites the cell in yellow/amber (see above), which makes it eligible for
+  (refund/adjustment), the **prior month's system-owned card cell is updated** to the actual
+  debited amount; the verified cell is marked **green** so the human can trust it. **Reconciliation
+  operates only on unverified (yellow) or revised (amber) card cells; verified (green) cells are
+  ignored. A newer statement updates the cell in yellow/amber (see above), which makes it eligible for
   reconciliation again.** (User may note the delta in `Comments` manually.)
 - If a `cc-payment` debit matches **more than one** card's payment-identification pattern,
   reconciliation **aborts** (fail-loud) rather than guessing. A debit matching **zero** cards is
@@ -290,8 +290,8 @@ human verification of the tags first, so they flow through the Transactions shee
      copy) in the working directory, preserving all sheets — the input is **never modified**. The
      system reads/writes **only the configured master sheet** plus the sheets it manages (the
      Transactions sheet and the `Control` status sheet); any other user sheets are untouched.
-   - Write **credit-card** totals directly into the main matrix (billing-date → month row,
-     creating or updating that row as defined under **Upsert**).
+   - Write **credit-card** totals directly into the main matrix (billing-date → month row),
+     creating or updating the row as defined under **Upsert**.
    - Add a **Transactions sheet** containing all **bank** transactions with best-guess tags.
    - Set verification status = **`pending`**.
 2. **Working copy present, status = `pending`:** leave it untouched — wait for the human. **If the
@@ -341,16 +341,17 @@ Month rows are keyed by the `Month Key`, which **uniquely identifies a matrix ro
 row may exist for a given month**. When processing data for a month, the system **updates the
 existing row if present, otherwise appends a new one** (never producing a duplicate). Because the
 system always works on a **copy** (never master), re-processing is safe rather than something to
-prevent. On overwrite, the system rewrites its system-owned cells (a re-written **card** cell
-re-enters the **unverified/yellow** state — or **amber** if it was previously verified (green) —
-itself the cue that it awaits re-reconciliation; **bank** figures carry no separate highlight). The update touches **only system-owned cells** —
+prevent. When a month row already exists, the system updates its system-owned cells (an updated
+**card** cell re-enters the **unverified/yellow** state — or **amber** if it was previously verified
+(green) — itself the cue that it awaits re-reconciliation; **bank** figures carry no separate
+highlight). The update touches **only system-owned cells** —
 the card totals and each bank's `Bank Debits` / `Credits/Transfers` — and **never** the manual
 `Comments` or the formula columns. These system-owned cells are **authoritative outputs —
-overwritten regardless of any manual edits** (manual notes belong only in `Comments`); credit-card
-columns in particular are rewritten **whenever the review sheet is (re)generated** (first run /
+updated regardless of any manual edits** (manual notes belong only in `Comments`); credit-card
+columns in particular are updated **whenever the review sheet is (re)generated** (first run /
 `regenerate`), since only bank-derived figures are gated behind verification. During an upsert,
-**only accounts with a statement present in that run are updated**; cells for missing accounts
-retain their existing values. If no row exists for that month, a new row is **appended at the
+**only accounts with a statement processed in the current run are updated**; all other system-owned
+cells retain their existing values. If no row exists for that month, a new row is **appended at the
 bottom** — the matrix only grows downward and rows are **never re-sorted** (months are processed in
 order, so the latest is always last; a rare back-filled month also simply appends). A newly
 appended row carries the previous matrix row's **cell formatting** (number formats, borders, fills,
@@ -361,9 +362,9 @@ a new row within the range is covered automatically.)
 
 Card cells carry the **three-state colour** described under reconciliation: **yellow (unverified)**
 when freshly written, **green (verified)** once confirmed against the bank debit, and **amber
-(revised)** when a newer statement overwrites a previously-green value. Reconciliation never
+(revised)** when a newer statement updates a previously-green value. Reconciliation never
 downgrades a green cell, but a **newer statement** re-opens it (→ amber). There is **no separate
-transient overwrite highlight** — bank figures are written with no fill.
+transient highlight** for updated cells — bank figures are written with no fill.
 
 ### Error handling
 The process favours **failing loudly** over guessing. If a statement PDF matches **no** account
@@ -381,7 +382,7 @@ This is the run-time, **same-run** guard: if both the original and a corrected s
 present together, the run **aborts** so the user removes the stale file. (This does **not**
 contradict "a newer statement is authoritative" under Card states — that rule is about a corrected
 statement processed **alone in a later run**, after the original was already finalized; the card
-cell is simply overwritten then. Both files present at once → abort; corrected file alone → use it.)
+cell is simply updated then. Both files present at once → abort; corrected file alone → use it.)
 The user fixes the input/config and re-runs.
 
 **Parse validation (correctness guarantee).** A bank statement is **accepted only if the extracted
