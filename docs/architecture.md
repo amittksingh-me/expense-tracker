@@ -43,6 +43,17 @@
   - `setForceFormulaRecalculation(true)` so year-scoped Median/Average refresh on open;
   - on `regenerate`, carry pinned rows over in place; delete the Transactions sheet on `complete`.
 
+- **System-owned-cells invariant** (mirrors the requirements). `WorkbookService` **owns and may
+  update**: the **credit-card totals**, each bank's **`Bank Debits`** and **`Credits/Transfers`**,
+  the **card-cell verification colour** (yellow/green/amber), and the **`Transactions`** and
+  **`Control`** sheets. It **never writes** the **formula** columns (kept as live Excel formulas)
+  or the **manual `Comments`** column. This invariant is the contract that lets the workbook stay
+  the source of truth while the system safely re-runs.
+
+- **Internal collaborators** (one public API, composed internally): the `Transactions` sheet
+  read/write lives in **`TransactionsSheet`**; cell-style/colour construction lives in a
+  **`MatrixCellStyles`** helper. The matrix upsert + month-row mechanics stay in `WorkbookService`.
+
 ## Configuration & secrets
 
 - **Config in YAML** (Jackson or SnakeYAML): accounts, mandates, paths (+ master sheet name),
@@ -54,21 +65,17 @@
   the **macOS Keychain** via the `security` CLI on demand (never logged).
 
 ### Account labels (the identifier)
-A unique friendly **Label** per account is the single key used across **config**, the **matrix
-column(s)**, the Transactions **`Bank` column**, and the **Keychain** (service `expense-tracker`,
-account = the Label, read via `security find-generic-password`). Because it drives a distinct
-matrix column, it must be unique — which is how two HDFC cards stay separate.
+A unique friendly **Label** per account is the single key used consistently across **config**, the
+**matrix column(s)**, the Transactions **`Bank` column**, **mandates**, and the **Keychain**
+(service `expense-tracker`, account = the Label, read via `security find-generic-password`). Because
+it drives a distinct matrix column it must be unique — which is how two same-issuer cards stay
+separate. **The concrete labels live in `config.yaml`, not here**, so the design stays generic when
+accounts are added or renamed.
 
-Current labels (will live in config):
-- **Bank accounts (3):** `HDFC`, `YES`, `NIYO`
-- **Credit cards (4):** `HDFC CC`, `YES CC`, `AXIS CC`, `HDFC RUPAY`
-- **Workbook password:** key `MASTER` — the input/output Excel is **password-protected**; the same
-  `SecretsProvider` fetches this to open and re-save the encrypted workbook.
-
-All verified accessible in Keychain (service `expense-tracker`).
-
-The Label is independent of the **PDF-match pattern**, the card **payment-identification
-pattern**, and the **password** (Keychain) — those are separate per-account fields.
+The Label is independent of the **PDF-match pattern**, the card **payment-identification pattern**,
+and the **password** — those are separate per-account fields. One extra Keychain key, **`MASTER`**,
+holds the workbook password (the input/output Excel is encrypted at rest; the same `SecretsProvider`
+fetches it to open and re-save the workbook).
 
 ### Run configuration (current setup; all config-driven)
 - **Config file:** `src/main/resources/config.yaml` (loaded from the classpath; pass a path
@@ -101,6 +108,21 @@ pattern**, and the **password** (Keychain) — those are separate per-account fi
   configured card is **logged and skipped** (not a hard abort). But **two debits matching the same
   card for the same prior month abort** (ambiguous double-payment/reversal), and a debit whose
   prior-month row doesn't exist is **skipped and logged**.
+
+## Domain model (vocabulary)
+
+The core types are small **immutable records** — a quick glossary before the components:
+
+- **`Account`** (+ `AccountType` bank/credit-card) — a configured account; `Rule` — a tagging rule.
+- **`RawBankTxn`** — a transaction as parsed (no account label); **`BankTxn`** — a `RawBankTxn`
+  tagged with its account label; **`TaggedTxn`** — a `BankTxn` + its `Tag`.
+- **`ParsedBankStatement`** (period, last-4, txns, `PrintedTotals`) and **`ParsedCardStatement`**
+  (billing date, `Total Amount Due`).
+- **`MonthlyFigure`** — a bank's per-month `Bank Debits` / `Credits/Transfers` / month / account.
+- **`Tag`** (vocabulary), **`Bucket`** + **`Treatment`** (Sign,Tag → Expense | Credits/Transfers |
+  Ignored), and the workbook verification status (`pending` / `complete` / `regenerate`).
+
+Everything above is pure data; the I/O lives only in `PdfTextExtractor` and `WorkbookService`.
 
 ## Components & boundaries
 
@@ -217,13 +239,23 @@ rule can express becomes a **pinned override**.
 
 ## Validation strategy
 
-The parse-correctness guard is a **check against the statement's own printed totals**:
-`opening + Σcredits − Σdebits == closing`. It is **enforced at run time** (`StatementBalanceValidator`,
-called from the Orchestrator): if a bank statement prints opening/closing balances and they don't
-reconcile, the run **aborts** (parse error). A statement that prints no balances is skipped (can't
-be checked). *(This is parse validation — kept deliberately distinct, in name and package, from
-credit-card **reconciliation** in `com.expensetracker.recon`, which matches a card's bill against
-the bank debit.)*
+The system **fails loud** at the earliest point a problem is detectable. The checks are independent
+and live on existing components (not a separate validator framework), grouped by phase:
+
+| Phase | Check | Where |
+|---|---|---|
+| **Config load** | duplicate labels; mandate → unknown bank; active card missing payment pattern | `ConfigLoader.validate` |
+| **Startup** | matrix has no duplicate `Month Key` rows | `WorkbookService.duplicateMonthRows` |
+| **Discovery** | each PDF resolves to exactly one account (0/>1 → abort) | `StatementDiscovery` |
+| **Discovery** | no two same-account bank statements with overlapping periods; no duplicate card+billing-month | `StatementOverlap` (+ Orchestrator card-dup check) |
+| **Parse** | extracted txns reconcile to printed totals (`opening + credits − debits = closing`) | `StatementBalanceValidator` |
+| **Reconciliation** | a `cc-payment` debit matches exactly one card; ≥2 debits for the same card/month → abort | `CardPaymentMatcher` / `Reconciler` |
+
+The **parse-correctness guard** deserves emphasis: it is enforced at run time — if a bank statement
+prints opening/closing balances and they don't reconcile, the run **aborts** (a statement that
+prints no balances simply isn't checked this way). *(Parse validation is kept deliberately distinct,
+in name and package, from credit-card **reconciliation** in `com.expensetracker.recon`, which
+matches a card's bill against the bank debit.)*
 
 ## Testing strategy
 
