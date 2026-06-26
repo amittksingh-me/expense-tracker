@@ -352,11 +352,11 @@ columns in particular are rewritten **whenever the review sheet is (re)generated
 **only accounts with a statement present in that run are updated**; cells for missing accounts
 retain their existing values. If no row exists for that month, a new row is **appended at the
 bottom** — the matrix only grows downward and rows are **never re-sorted** (months are processed in
-order, so the latest is always last; a rare back-filled month also simply appends). **A newly
+order, so the latest is always last; a rare back-filled month also simply appends). A newly
 appended row carries the previous matrix row's **cell formatting** (number formats, borders, fills,
 fonts) and the **same live Excel formulas** in every formula-driven column, **adjusted to the new
 row's references**, so workbook calculations continue automatically; only the **system-owned input
-cells** are then written with the new values.** (Conditional formatting is range-based in Excel, so
+cells** are then written with the new values. (Conditional formatting is range-based in Excel, so
 a new row within the range is covered automatically.)
 
 Card cells carry the **three-state colour** described under reconciliation: **yellow (unverified)**
