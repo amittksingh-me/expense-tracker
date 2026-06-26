@@ -1,0 +1,175 @@
+ BLAH TESTS SAMPLE                                Customer ID: R0000000000
+                                                 MICR Code: 4005678900
+ IFSC Code: STCB0000078                          Nomination Registered: Yes
+ SOME ADDRESS IN BENGALURU, BANGALORE
+ URBAN, 560000
+ Ph.no: +910000000000
+
+
+ Saving Account Balance:
+
+    45,027.00
+Statement from 01-05-2026 To 31-05-2026
+Savings Account No.: 20012310570000                                          Currency: INR
+   Date                     Narration                  Chq/Ref No.          Withdrawal (Dr)       Deposit (Cr)       Balance
+01-05-2026     B/F                                                                            -                  -    50,000.00
+               20012310570000:Int.Pd:31-03-
+01-05-2026                                                                                    -           50.00       50,050.00
+               2026 to 30-04-2026
+               UPI/P2M/867094751216/20012310
+01-05-2026                                                                                    -            5.00       50,055.00
+               570000/010526      ~
+               UPI/P2P/612253180018/20012310
+02-05-2026                                                                                    -        4,800.00       54,855.00
+               570000/020526      ~
+               UPI/P2P/648863629746/PAYEEA
+02-05-2026                                                                          1,500.00                     -    53,355.00
+               EKA/CNRB00000/UPI ~
+               UPI/P2P/648890524377/PAYEEB
+02-05-2026                                                                            800.00                     -    52,555.00
+               J /KARB00009/UPI ~
+               UPI/P2P/612548600765/PAYEEC
+05-05-2026                                                                             20.00                     -    52,535.00
+               GU/UBIN05411/UPI ~
+               UPI/P2M/612644797362/VENDORAB
+06-05-2026                                                                             60.00                     -    52,475.00
+               /YESB0YESU/Pay To D~
+               UPI/P2M/613374797106/VENDOR
+13-05-2026                                                                             18.00                     -    52,457.00
+               S I/AIRP00000/PayviaRa
+               UPI/P2M/613404808856/VENDOR
+14-05-2026                                                                             66.00                     -    52,391.00
+               S I/AIRP00000/PayviaRa
+               UPI/P2M/650109911008/VENDOR
+15-05-2026                                                                             18.00                     -    52,373.00
+               S I/AIRP00000/PayviaRa
+               UPI/P2P/650295561717/PAYEED
+16-05-2026                                                                          5,000.00                     -    47,373.00
+               P/SBIN00127/advance
+   Date                Narration             Chq/Ref No.   Withdrawal (Dr)       Deposit (Cr)       Balance
+             UPI/P2M/613945932267/VENDRA
+19-05-2026                                                           150.00                     -    47,223.00
+             In/UTIB00005/UPI
+             UPI/P2M/613929349504/THE
+19-05-2026                                                           190.00                     -    47,033.00
+             SHOPB/HDFC0MERU/UPI
+             UPI/P2M/650632481875/BUSA/YE
+20-05-2026                                                            20.00                     -    47,013.00
+             SB0YBLU/Payment
+             UPI/P2M/614070251370/WALLETA/
+20-05-2026                                                                   -           20.00       47,033.00
+             YESB0000022/R02 Phon
+             UPI/P2M/614154024008/VENDOR
+21-05-2026                                                            55.00                     -    46,978.00
+             S I/AIRP00000/PayviaRa
+             UPI/P2M/650845323433/VENDOR
+22-05-2026                                                            20.00                     -    46,958.00
+             S I/AIRP00000/PayviaRa
+             UPI/P2P/651005643080/PAYEEE
+24-05-2026                                                           300.00                     -    46,658.00
+             K/UCBA00012/UPI
+             UPI/P2P/651014836245/PAYEEF
+24-05-2026                                                            80.00                     -    46,578.00
+             HU/SBIN00029/UPI
+             UPI/P2M/651197083918/VENDOR
+25-05-2026                                                            55.00                     -    46,523.00
+             S I/YESB00000/VENDORSI
+             UPI/P2M/614683657431/THE
+26-05-2026                                                           140.00                     -    46,383.00
+             SHOPB/HDFC0MERU/UPI
+             UPI/P2M/614659866770/THE
+26-05-2026                                                            35.00                     -    46,348.00
+             SHOPB/HDFC0MERU/UPI
+             UPI/P2P/614695465523/PAYEEG
+26-05-2026                                                            10.00                     -    46,338.00
+             R H/PUNB06035/UPI
+             UPI/P2M/651374864779/VENDOR
+27-05-2026                                                            55.00                     -    46,283.00
+             S I/AIRP00000/PayviaRa
+             UPI/P2M/651308375556/VENDOR
+27-05-2026                                                            18.00                     -    46,265.00
+             S I/AIRP00000/PayviaRa
+             UPI/P2M/614848891274/VENDRA
+28-05-2026                                                           250.00                     -    46,015.00
+             In/UTIB00005/UPI
+             UPI/P2M/651578188312/VENDOR
+29-05-2026                                                            18.00                     -    45,997.00
+             S I/AIRP00000/PayviaRa
+             UPI/P2M/615072083181/PAYEEH
+30-05-2026                                                           220.00                     -    45,777.00
+             AYI/YESB0YBLU/iPhone 1
+             UPI/P2M/615037485008/PAYXX
+30-05-2026                                                           750.00                     -    45,027.00
+             Add/YESB0PTMU/Payment
+                           Total                                  9,848.00           4,875.00        45,027.00
+Important message for customers:
+Term Deposit / NRO SB account / Recurring Deposit
+
+1. As per CBDT Circular No. 03/11 dated 13.May.2011, TDS certificate (Form 16A) will be issued ONLY to customer who has furnished a valid PAN.
+Customers who do not have a valid PAN (as per the Bank as well as Income Tax records), would not be able to claim a refund with the Income Tax Dept
+as TDS deducted shall not reflect in 26 AS. You are requested to update your PAN with the Bank at the earliest.
+
+2. To avail TDS benefit on specific Fixed Deposits for the Financial Year, you are requested to submit the relevant Form 15 G/H if applicable. A fresh
+Form 15 G/H needs to be submitted for financial year, within the first week of April in each financial year.
+
+3. Please further note that in the absence of valid PAN, Form 15 G/H and other exemption certificates will be invalid and tax will be deducted.
+
+Nomination Facility
+
+Take care of your loved ones. Add a nominee for all your accounts/lockers immediately. Contact your Branch/ Relationship Manager today. Please
+contact your nearest branch or log on to our website for further details.
+
+Salary Account holders
+
+In the event of no salary credits for any continuous three months, the salary account will be converted to regular savings account. Please refer to the
+Term and Condition on our website for further details.
+
+Debit / Prepaid Card
+
+1. Safety Tips- Do not transact if you find any suspicious device attached to the ATM machine. Do not take help from strangers at an ATM.
+
+2. The Credit Information Bureau India Ltd. (CIBIL) is an initiative of the Government of India and the Reserve Bank of India (RBI) to improve the
+functionality and stability of the Indian financial system. All banks and financial institutions participating in this initiative are required to share customer
+data with CIBIL.
+
+3. Never share your Card number, CVV, PIN, OTP, Internet Banking User ID, Password or URN with anyone, even if the caller claims to be a bank
+employee. Sharing these details can lead to unauthorized access to your account.
+Depositors Protection
+Bank deposit upto INR 9,99,999 in respect of each depositor is fully insured by the Deposit Insurance and Credit Guarantee Corporation the Deposit
+Insurance Scheme.
+Legends for transactions in your account
+IB - Internet Banking Transaction
+INF - Internet Fund Transfer in Linked Accounts
+RTGS - Real Time Gross Settlement (Instant transfer above INR 9,99,999) NEFT - National Electronic Fund Transfer
+BIL - Internet Bill payment or Funds Transfer to Third Party
+PCl/PCD - POS Transaction
+OS - Online Shopping Transaction
+BP - Bill Pay Transaction
+
+Any discrepancy, error, omission, incorrect entry discovered in examining the statement must be notified in writing to the Bank within 15 days from the
+date of the present statement otherwise the Bank will not be liable to any claim whatsoever.
+
+You may write to us at customercare@sbmbank.co.in.
+
+Any change in address/contact details should be promptly advised to the Bank in writing together with proof of address.
+
+THIS IS A COMPUTER GENERATED STATEMENT, NEEDS NO AUTHENTICATION.
+
+SBM Bank (India) Ltd.(Registered Office): 101, Raheja Centre First Floor, Free Press Journal Marg,
+Nariman Point, Mumbai - 400021, Maharashtra
+T: +91 22 4302 8888. Swift: STCBINBX. W: www.sbm.bank.in
+
+Category of services: Banking & Financial Services. CIN No.: U65999MH2017FLC293229.
+
+Please note : For accounts that are categorised as “Inactive having zero balance(zero balance & no transactions in the last 12 months)” and “Inoperative
+(no transactions in the last 24 months)”, at the end of each financial year the Bank will send only annual statements of accounts.
+Your annual statement covers statement for month of March as well and no separate monthly statement of March will be sent.
+
+
+
+
+SBM Bank (India) Ltd.
+
+Contents of this statement shall be considered correct if no error is reported within 30 days of receipt of statement. The
+address on this statement is that on the day of requesting this statement.
+

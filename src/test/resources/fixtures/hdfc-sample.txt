@@ -1,0 +1,148 @@
+                                                                                                                                                               Page 1 of 3
+
+
+
+
+Test Tests Sample
+Flat, Some Address                                                               Customer ID            : 00000000
+
+Some Landmark                                                                    RM Name                : Sample RM Name
+Some second line address                                                         RM Contact No          : --022-00000000
+Bangalore                                                                        RM Email ID            : rm.name@hdfc.bank.in
+Karnataka
+India
+560000
+
+
+
+Statement as on : 31/05/2026
+Customer Email : user@example.com
+
+                                                                 Account Relationship Summary
+
+
+                                                                      CR         Limit          Sweep in FD Amt#            Hold                 Total Withdrawable**
+  Ccy          Account Type                      Balance              DR                                                   Amount                      Balance
+
+   INR   SAVINGS ACCOUNTS                               695200.00     CR                 0.00                    0.00                    0.00                    695200.00
+
+   INR   TERM DEPOSITS                                        0.00    CR
+
+
+** Total Withdrawable Balance does not include Hold Amount and Unclear Amount.
+
+Total Withdrawable Balance=Balance+Limit+Sweep in FD Amt-Hold Amount.
+
+# Sweep In FD may have linkages to multiple accounts.
+
+
+
+
+                                                                                                                        Signature Not Verified
+                                                                                                                        Digitally signed by DS HDFC Bank Ltd
+                                                                                                                        Date: 2026.06.02 17:20:12 +05:30
+                                                                                                                        Reason: DIGITAL SIGNATURE
+                                                                                                                        Location: MUMBAI
+                                                                                                                          Page 2 of 3
+
+
+
+
+Test Tests Sample
+Customer ID        : 00000000                                      Account Branch        : 291
+Account Number     : 00000000000000                                Nariman Pt Mittal Chamber
+Joint Holders 1    : Not Applicable                                Hdfc Bank Ground Floor Mittal
+                                                                   Chambers 228 Nariman Point
+Joint Holders 2    : Not Applicable
+                                                                   Dist Mumbai
+Account Type       : INSTANT SAVING SALARY PREMIUM
+                   (161)                                           Mumbai
+Statement From     : 01/05/2026 To 31/05/2026                      Maharashtra
+Currency           : INR                                           400021
+Nomination         : Registered                                    RTGS/NEFT IFSC : HDFC0000291 MICR: 400240046
+
+
+
+                                                    Savings Account Details
+
+Opening Balance : 6,00,000.00                                      Limit       : 0.00
+
+
+
+
+    Txn Date                          Narration                  Withdrawals            Deposits            Closing Balance
+    01/05/2026     ACH D- FUNDAB 23232223                              50,000.00                     0.00              5,50,000.00
+                   CAMS-13131313313Value Dt 01/05/2026
+                   Ref 003480211556
+    01/05/2026     ACH D- FUNDAB 32232322                              60,000.00                     0.00              4,90,000.00
+                   CAMS-313133133Value Dt 01/05/2026
+                   Ref 003480215227
+    01/05/2026     ACH D- FUNDAB 42425252                            1,00,000.00                    0.00              3,90,000.00
+                   CAMS-232323232Value Dt 01/05/2026
+                   Ref 003480215950
+    02/05/2026     00012050001396Hly Int-IN0020210178                         0.00                 200.00              3,90,200.00
+                   Value Dt 02/05/2026 Ref 605020460732
+    04/05/2026     ACH D- FUNDCD 12313131                               15,000.00                     0.00              3,75,200.00
+                   CAMS-590781574646Value Dt 04/05/2026
+                   Ref 003513586977
+    07/05/2026     CC 000000000XXXXXX8339 Autopay                     1,20,000.00                    0.00              2,55,200.00
+                   SI-TAD Value Dt 07/05/2026 Ref 740268185
+    07/05/2026     CC 000000000XXXXXX3787 Autopay                      20,000.00                     0.00              2,35,200.00
+                   SI-TAD Value Dt 07/05/2026 Ref 740159992
+    07/05/2026     SI HGALP115BD013322232 Axis                        40,000.00                     0.00              1,95,200.00
+                   Ba-07/05/26Value Dt 07/05/2026
+    29/05/2026     FT-                                                        0.00          5,00,000.00                6,95,200.00
+                   AAAASALARYXXXXXXXXXXXXXXXXXXX
+                   XXXXXXXXXXXXXXXXXXXX Value Dt
+                   29/05/2026 Ref 011655648363
+                                                                                                                                  Page 3 of 3
+
+
+
+
+Test Tests Sample
+Customer ID           : 00000000                                                Account Branch          : 291
+Account Number        : 00000000000000                                          Nariman Pt Mittal Chamber
+Joint Holders 1       : Not Applicable                                          Hdfc Bank Ground Floor Mittal
+                                                                                Chambers 228 Nariman Point
+Joint Holders 2       : Not Applicable
+                                                                                Dist Mumbai
+Account Type          : INSTANT SAVING SALARY PREMIUM
+                      (161)                                                     Mumbai
+Statement From        : 01/05/2026 To 31/05/2026                                Maharashtra
+Currency              : INR                                                     400021
+Nomination            : Registered                                              RTGS/NEFT IFSC : HDFC0000291 MICR: 400240046
+
+
+
+                                                                Savings Account Details
+
+Opening Balance : 6,00,000.00                                                   Limit         : 0.00
+
+
+
+
+ SUMMARY
+
+                              Opening Balance            Debit Amount              Credit Amount                Closing Balance
+
+                               6,00,000.00                      4,05,000.00               5,00,200.00           6,95,200.00
+
+                                                         Debit Count               Credit Count
+                                                                7                         2
+
+           Total Withdrawal Balance***          : 6,95,200.00
+
+           Total Sweep In FD Linked**           : 0.00
+
+
+
+
+**FD may be linked to other Accounts as well
+
+*** Total withdrawable Balance=Available Balance+Limit+Sweep In FD Amount-Hold Amount
+
+
+      Your Combined statement generation frequency is monthly and the next statement will be generated on next month end. Contents of
+                   this statement will be considered correct if no error is reported within 30 days of receipt of statement.
+                                                                    *** End of Statement ***

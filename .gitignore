@@ -1,0 +1,14 @@
+# Real, private run configuration (real paths, card last-4, self-transfer name).
+# Lives alongside the committed template src/main/resources/config.yaml.
+config.local.yaml
+
+# Build output
+/target/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IntelliJ IDE state (local paths, history)
+.idea/
+*.iml

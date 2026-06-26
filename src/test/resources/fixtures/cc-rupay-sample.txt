@@ -1,0 +1,188 @@
+ CC_Product2 Credit Card Statement
+ HSN Code: 997113           HDFC Bank Credit Cards GSTIN: 00AAAAA0000A0Z0
+
+ SAMPLE TEST USER                                          Credit Card No.                                      000000XXXXXX3787
+
+ FLAT NO, BUILDING NAME                Alternate Account Number                          0001010730000000000
+ AREA MAIN ROAD
+                                                           Statement Date                                             17 May, 2026
+ BANGALORE 560000 KAR
+ Email : sample.user@example.com                             Billing Period                            18 Apr, 2026 - 17 May, 2026
+
+
+
+ To update personal details : Change of Address: click here        |     Change of email-id: click here    |      Change of Mobile number: click here
+ To update any other personal details, please write a letter to : The Manager, HDFC Bank Cards Division, Door No 94 SP, Estate Bus Stand, Wavin Main Road, Mogappair West, Chennai - 600058
+
+
+
+
+                                             PAYMENTS/CREDITS                          PURCHASES/DEBIT
+       PREVIOUS STATEMENT DUES                                                                                                FINANCE CHARGES                     TOTAL AMOUNT DUE
+                                                 RECEIVED                             (Current Billing Cycle)
+
+               C99,999.99
+                                         _      C99,999.99                  +               C99,999.99               +               C0.00              =         C25,000.00
+               TOTAL CREDIT LIMIT
+                                                        AVAILABLE CREDIT LIMIT                                  AVAILABLE CASH LIMIT                              MINIMUM DUE               DUE DATE
+                 (Including Cash)
+
+                                                                                                                                                                  C9,999.99                 06 Jun, 2026
+                  C99,99,999                                    C99,99,999                                                  C0
+
+
+
+
+Past Dues                   OVER LIMIT                  3 MONTHS +                       2 MONTHS                          1 MONTH                      CURRENT DUES                     MINIMUM DUES
+(if any)                    C0.00                       C0.00                            C0.00                             C0.00                        C9,999.99                        C9,999.99
+
+Benefits on your card
+
+                                                    IMPORTANT INFORMATION
+
+                                                    1. MITC - MINIMUM AMOUNT DUE(MAD) CALCULATION ON YOUR HDFC BANK CREDIT CARD REVISEDWEF JUNE 2025 STMT REF MITC FOR
+                                                       DETAILS
+                                                    2. YOUR NOMINATED BANK ACCOUNT WILL BE DEBITED FOR THE REPAYMENT OF YOUR CREDIT CARD DUES ON THE PAYMENT DUE DATE
+
+
+
+                                                             Reward Points                               Opening Balance             Feature + Bonus Reward      Disbursed                    Adjusted/Lapsed
+                                                                                                                                     Points Earned
+
+                                                             841                                         672                         169                         0                            0
+
+
+                                                                REDEEM REWARDS                           POINTS EXPIRING             IN 30 DAYS 0                IN 60 DAYS 0
+
+
+                                              * All contents of the statement will be deemed to be correct and accepted by you, unless you inform us of any discrepancies within 30 days from the date of this statement.
+                                              * The available credit limit showed herein takes into account charges incurred but not billed.
+
+
+                                                 Your Card Control Setting As on : 17 May, 2026
+                                                 Domestic Transaction                                           International Transaction
+
+                                                          Online                POS              Tap & Pay             Online                POS              Tap & Pay                        MODIFY ON MyCards
+
+
+                                                     ENABLED             ENABLED              DISABLED             ENABLED             DISABLED           DISABLED             Card Control              Set Pin
+
+
+
+
+                                                 Purchase Indicator / Insights (PI)
+
+                                                l INSURANCE                        l TRAVEL                         l RESTAURANT                     l APPARELS                       l MISC
+                                                  44%                                 44%                              5%                              3%                                4%
+
+
+
+
+                                                 Domestic Transactions
+                                                 DATE & TIME                       TRANSACTION DESCRIPTION                                                                REWARDS                  AMOUNT          PI
+
+                                                                                   SAMPLE USER
+
+                                                 18/04/2026| 08:43                 UPI-CAFE VENDORX                                                                                                 C 999.99       l
+                                                 19/04/2026| 20:07                 UPI-PAYEE NAME                                                                                                     C 99.99      l
+                                                 19/04/2026| 09:15                 UPI-Payee R                                                                                                      C 999.99       l
+                                                 19/04/2026| 14:42                 UPI-VENDB E RETAIL LIMITED                                                                                       C 999.99       l
+                                                 01/05/2026| 08:36          EMI    UPI-vendorgenservicesxxxx                                                                                      C 99,999.99      l
+                                                 01/05/2026| 09:32                 UPI-AB VENDORSS                                                                                                  C 999.99       l
+                                                 01/05/2026| 09:56                 UPI-AB VENDORSS                                                                                                    C 99.99      l
+
+
+
+ Page 1 of 3
+                                                                                                                              HSN Code: 997113
+    CC_Product2 Credit Card Statement                                                            HDFC Bank Credit Cards GSTIN: 00AAAAA0000A0Z0
+
+Offers on your card
+
+
+
+
+Domestic Transactions
+DATE & TIME                        TRANSACTION DESCRIPTION                                            REWARDS                    AMOUNT       PI
+
+01/05/2026| 10:00                  UPI-AB VENDORSS                                                                                 C 99.99    l
+02/05/2026| 21:09                  UPI-PAYEE NAME                                                                               C 999.99    l
+04/05/2026| 12:54                  UPI-GENERALVENDORX MULTIPLEXA                                                                  C 999.99    l
+06/05/2026| 09:22                  UPI-GENERAL VENDORX EATRY                                                                         C 99.99    l
+06/05/2026| 09:45           EMI    UPI-VENDORX                                                                                 C 99,999.99    l
+06/05/2026| 16:15                  UPI-CITYBUS SERVICE 0000                                                                         C 999.99    l
+07/05/2026| 09:26                  AUTOPAY THANK YOU (Ref# ST261280084000010009963)                                          + C 99,999.99    l
+08/05/2026| 16:58                  UPI-AB 11 XYZ                                                                                  C 999.99    l
+10/05/2026| 07:04                  UPI-Payee R                                                                                     C 99.99    l
+15/05/2026| 13:07                  UPI-VENDORS INDIA FOODSERVIC                                                                   C 999.99    l
+15/05/2026| 17:11                  UPI-AB 11 XYZ                                                                                   C 99.99    l
+16/05/2026| 18:38                  UPI-Payee R                                                                                     C 99.99    l
+17/05/2026| 18:28                  UPI-Payee R                                                                                     C 99.99    l
+
+
+
+
+                                                      TRANSACTIONS                    TOTAL AMOUNT
+           Eligible for EMI                                                                                             CONVERT TO EMI
+                                                           2                            C99,999.99
+
+
+Rewards Program Points Summary
+SR NO.          PROGRAMS                                                                                                         BONUS POINTS
+
+1               1% CP on other spendsAcc                                                                                                132 pts
+
+2               3% CP on select Categories Acc                                                                                           37 pts
+
+                Total                                                                                                                   169 pts
+
+
+
+
+ Page 2 of 3
+                                                                                                                                                                                HSN Code: 997113
+     CC_Product2 Credit Card Statement                                                                                                             HDFC Bank Credit Cards GSTIN: 00AAAAA0000A0Z0
+
+
+Important Information
+l     The "Available Credit Limit" shown in this statement takes into account charges incurred but not due. Please ensure that at least the "Minimum Amount Due" reaches us by the "Due Date".
+l     Maintain a healthy credit status: Pay atleast minimum amount by the due date, or within 3 days after, to avoid Defaulter status with Credit Information Companies.
+l     If the minimum amount due or part amount less than the total amount due is paid, interest charges are applicable (including fresh purchases, if any) on an average daily reducing balance method.
+l     To Hotlist your credit card, login into Netbanking, please click here or call our phone banking numbers.
+l     Making only the minimum payment every month would result in the repayment stretching over months/years with consequential compounded interest payment on your outstanding balance. The level
+      of unpaid amount of the bill i.e., part payment beyond 'minimum amount due', at which the interest-free credit period benefits would not be available to cardholders.
+l     When the card member receives communication from Bank regarding a refund from the merchant for a transaction incurred kindly call Phone-Banking @ 1800 1600 / 1800 2600 to issue DD or to obtain an
+      update on the refund. Customers travelling overseas can reach out to +9122 61606160.
+l     To know the Voluntary Codes as prescribed by the "The Banking Codes and Standards Board of India (BCSBI)", please click here
+l     How to read GST entry in your Credit Card statement:
+
+                                                        GST Entry                                       GST                              GST          State
+                                                                                                                  Invoice Number
+                                                                                                        Type                            Rate %        Code
+
+                                                       SGST-VPS *********** - Rate 9.0 - 33****         SGST     VPS*************        9.0           33
+
+“I/We hereby declare that though our aggregate turnover in any preceding financial year from 2017-18 onwards is more than the aggregate turnover notified under sub-rule (4) of rule 48, we are not required to
+prepare an invoice in terms of the provisions of the said sub-rule.”
+
+
+
+
+    Useful Links
+
+
+                  Statement & Payment                               MITC (Most Important
+                                                                                                                      Payment Options                                    Customer Rights Policy
+                  related information                               Terms and Conditions)
+
+
+
+
+                                                                                                                                                                                      Digitally
+                                                                                                                                                                                      signed by
+                                                                                                                                                                            DS HDFC   DS HDFC
+                                                                                                                                                                            BANK      BANK
+                                                                                                                                                                            LIMITED 7 LIMITED 7
+    Page 3 of 3                                                                                                                                                                       Date:
+                                                                                                                                                                                      2026.05.18
+

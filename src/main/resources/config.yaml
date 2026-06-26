@@ -1,0 +1,33 @@
+# PUBLIC TEMPLATE — placeholder values only (no real paths, card digits, or names).
+# To run for real: copy this file to config.local.yaml (same folder; gitignored) and fill in
+# your real paths, card last-4 (paymentPattern), and self-transfer payee name. Main loads
+# config.local.yaml automatically from the classpath when present (it takes precedence over
+# this template).
+keychainService: expense-tracker
+masterSheet: Expenses
+inputWorkbook:  /path/to/working/cash_mgmt_monthly.xlsx
+outputWorkbook: /path/to/working/cash_mgmt_monthly.out.xlsx
+workingDir:     /path/to/working
+
+# 'format' selects the statement parser and is separate from 'label' (several accounts can
+# share one format). 'label' drives the matrix column(s); 'pdf' matches the statement file.
+accounts:
+  - { label: HDFC,        type: bank,        format: HDFC_BANK, pdf: 'encrypted_hdfc\.pdf' }
+  - { label: NIYO,        type: bank,        format: NIYO_BANK, pdf: 'encrypted_niyo\.pdf' }
+  - { label: 'YES',       type: bank,        format: YES_BANK,  pdf: 'encrypted_yes\.pdf' }
+  - { label: HDFC CC,     type: credit_card, format: HDFC_CARD, pdf: 'encrypted_cc_hdfc\.pdf',        mandateBank: HDFC, paymentPattern: 'XXXX' }
+  - { label: HDFC RUPAY,  type: credit_card, format: HDFC_CARD, pdf: 'encrypted_cc_hdfc_2\.pdf',  mandateBank: HDFC, paymentPattern: 'XXXX' }
+  - { label: YES CC,      type: credit_card, format: YES_CARD,  pdf: 'encrypted_cc_yes\.pdf',         mandateBank: 'YES',  paymentPattern: 'CREDIT CARD' }
+  - { label: AXIS CC,     type: credit_card, format: AXIS_CARD, pdf: 'encrypted_cc_axis\.pdf',        mandateBank: HDFC, paymentPattern: 'Axis', skip: true }
+
+# Tagging rules — readable substrings, first match wins
+rules:
+  - { pattern: 'CAMS',             tag: INVESTMENT }
+  - { pattern: 'KFINTECH',         tag: INVESTMENT }
+  - { account: HDFC, pattern: 'Autopay', tag: CC_PAYMENT }
+  - { account: HDFC, pattern: 'Axis',    tag: CC_PAYMENT }
+  - { pattern: 'CREDIT CARD',      tag: CC_PAYMENT }
+  - { pattern: 'SALARY',           tag: SALARY }
+  - { pattern: 'Hly Int',          tag: INTEREST }
+  - { pattern: 'Int.Pd',           tag: INTEREST }
+  - { pattern: 'YOUR SELF TRANSFER NAME', tag: SELF_TRANSFER }

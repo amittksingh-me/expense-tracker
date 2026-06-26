@@ -1,0 +1,432 @@
+                                   YOUR CONSOLIDATED STATEMENT FOR MAY' 26
+
+
+
+ MRS. MOCKITO SAMPLE
+ SOME ADDRESS LINE 1                                                    RM Details :
+ SOME ADDRESS LINE 2                                                    Sample RM Name
+ SOME ADDRESS LINE 3                                                    rm.name@yes.bank.in
+ BENGALURU                                                              0000000000
+ KARNATAKA
+ 560000
+ INDIA
+                                                                        Customer Care Details -
+ EMAIL ID   : Registered                                                Call us India 1800 1200
+ MOBILE NO. : Registered                                                Call us outside India +91 22 50795101
+
+
+                                           Account Relationship Summary as on 31/05/2026
+      Account Number                  Account Type                        Currency                              Balance
+      806791900000000                 Saving Account                         INR                                            9,99,999.99
+      806740400000000                  Term Deposit                          INR                                            9,99,999.99
+      806738400000000                  Term Deposit                          INR                                            9,99,999.99
+      806738400000000                  Term Deposit                          INR                                            9,99,999.99
+      806740400000000                  Term Deposit                          INR                                            9,99,999.99
+      806740400000000                  Term Deposit                          INR                                            9,99,999.99
+      806740400000000                  Term Deposit                          INR                                            9,99,999.99
+
+                                                      YES REWARDZ Program
+                           Previous YES REWARDZ YES REWARDZ earned this            YES REWARDZ redeemed            YES REWARDZ
+     Membership ID
+                                   balance*             month                            this month                   balance
+         00000000                   9,999                         65                             0                         9,999
+
+YES REWARDZ accrued on your Yes Bank Account includes expired Rewardz.
+To view your YES Rewardz Smart Statement logon to www.yesrewardz.com/smarthub
+
+
+
+
+Say "Hi" on +91 82912 01200 for    YES TOUCH PhoneBanking Number:
+WhatsApp Banking                   1800 1200 (Toll Free for Mobile & Landlines in India)
+Email us at yestouch@yes.bank.in   +91 22 5079 5101 (When calling from Outside India)
+                                   Toll Free number from USA: 18333800149
+CIN: L65190MH2003PLC143249         Canada: 18334910559 | UK: 8000489153 | UAE: 800035702510
+
+
+                                                                                                                                    Page 1 of 8
+           Statement Of Transactions In Saving Account No: 806791900000000 For The Period Of 01-May-2026 to 31-May-2026
+
+ Branch : SOME ADDRESS SOME ADDRESS SOME ADDRESS SOME ADDRESS SOME ADDRESS SOME ADDRESS SOME ADDRESS SOME ADDRESS
+                      (W),MUMBAI,400050, IFSC : YESB0008888, MICR: 400533333, Email: branch.mgr@yes.bank.in
+
+Primary Holder   : MOCKITO SAMPLE                              Product Code                 : 987
+Joint Holder 1   : NOT APPLICABLE                            A/C OPENING DATE             : 30-Apr-2014
+Joint Holder 2   : NOT APPLICABLE                            Account Variant/ description : SMART SALARY PLATINUM
+Nominee(s)       : DUMMY DUMMY DUMMY                          Currency                     : INR
+                                                             Account status               : ACCOUNT OPEN REGULAR
+                                                             OD limit                     : 0.00
+                                                             Available Balance            : 9,99,999.99
+                                                             Sweep in                     :
+Transaction                                                   Cheque
+            Value Date             Description                                Withdrawals        Deposits          Running Balance
+   Date                                                   No/Reference No.
+01/05/2026 01/05/2026 B/F ...                                                                                             5,00,000.00
+
+                      UPI/122414330176/From:sampleab
+01/05/2026 01/05/2026 a@okhdfcbank/To:qpayee0007@ybl                                   50.00                0.00          4,99,950.00
+                      /UPI
+                      UPI/612136181736/From:sampleab
+01/05/2026 01/05/2026 a-1@okaxis/To:payee1.upi@okaxi                               1,750.00                0.00          4,98,200.00
+                      s/April
+                         1002020003248188-AUTOPAY YBL
+02/05/2026 02/05/2026                                       000000005436              500.00                0.00          4,97,700.00
+                         CREDIT CARD
+                      UPI/122470794592/From:sampleab
+02/05/2026 02/05/2026 a@okhdfcbank/To:9900000001@axl                                5,000.00                0.00          4,92,700.00
+                      /UPI
+                      UPI/122977226086/From:sampleab
+11/05/2026 11/05/2026 a@okhdfcbank/To:payee2upi                             2,000.00                0.00          4,90,700.00
+                      @okicici/UPI
+                      UPI/123206816756/From:sampleab
+16/05/2026 16/05/2026 a@okhdfcbank/To:vyapar.17164940                                 180.00                0.00          4,90,520.00
+                      3685@hdfcbank/UPI
+                      UPI/123207177199/From:sampleab
+16/05/2026 16/05/2026 a@okhdfcbank/To:paytmqr10p9xk                                    75.00                0.00          4,90,445.00
+                      @paytm/UPI
+                      UPI/123228493846/From:sampleab
+16/05/2026 16/05/2026 a@okhdfcbank/To:pinelabs.2782562                                390.00                0.00          4,90,055.00
+                      @hdfcbank/UPI
+                      UPI/123240806342/From:sampleab
+16/05/2026 16/05/2026 a@okhdfcbank/To:karigari.6348708                              3,400.00                0.00          4,86,655.00
+                      1@hdfcbank/UPI
+                      UPI/650318112516/From:sampleab
+17/05/2026 17/05/2026 a-1@okaxis/To:8000000002@ybl/UP                                  58.00                0.00          4,86,597.00
+                      I
+                      UPI/650399739302/From:sampleab
+17/05/2026 17/05/2026 a-1@okaxis/To:9600000003@ptyes/                                  89.00                0.00          4,86,508.00
+                      UPI
+                      UPI/613823610765/From:sampleab
+18/05/2026 18/05/2026 a-1@okaxis/To:9800000004-2@ybl/                                 453.00                0.00          4,86,055.00
+                      UPI
+
+
+
+
+Say "Hi" on +91 82912 01200 for    YES TOUCH PhoneBanking Number:
+WhatsApp Banking                   1800 1200 (Toll Free for Mobile & Landlines in India)
+Email us at yestouch@yes.bank.in   +91 22 5079 5101 (When calling from Outside India)
+                                   Toll Free number from USA: 18333800149
+CIN: L65190MH2003PLC143249         Canada: 18334910559 | UK: 8000489153 | UAE: 800035702510
+
+
+                                                                                                                                  Page 3 of 8
+Transaction                                                     Cheque
+            Value Date             Description                                 Withdrawals       Deposits          Running Balance
+   Date                                                     No/Reference No.
+                         UPI/123347772070/From:sampleab
+                         a@okhdfcbank/To:vendingsoftware
+18/05/2026 18/05/2026                                                                   10.00               0.00          4,86,045.00
+                         228525.rzp@rxairtel/PaymentToVen
+                         dingSoftware
+                      UPI/123407461807/From:sampleab
+20/05/2026 20/05/2026 a@okhdfcbank/To:paytmqr6rr8r4@                                   160.00               0.00          4,85,885.00
+                      ptys/UPI
+                      UPI/650638663843/From:sampleab
+20/05/2026 20/05/2026 a-1@okaxis/To:payee3upi@okicici/                                1,100.00              0.00          4,84,785.00
+                      UPI
+                         AUTOPAY/HGALP05FC003859267
+21/05/2026 21/05/2026                                                                 3,200.00              0.00          4,81,585.00
+                         70/BESCOM000KAR01/9603435557
+                      UPI/123508160866/From:sampleab
+22/05/2026 22/05/2026 a@okhdfcbank/To:paytmqr6pqlif@                                    20.00               0.00          4,81,565.00
+                      ptys/UPI
+                      UPI/123537623146/From:sampleab
+22/05/2026 22/05/2026 a@okhdfcbank/To:7400000006-2@ib                               15,000.00               0.00          4,66,565.00
+                      l/UPI
+                      UPI/123633327552/From:sampleab
+24/05/2026 24/05/2026 a@okhdfcbank/To:paytmqr6yf173@                                   140.00               0.00          4,66,425.00
+                      ptys/UPI
+                      UPI/123633505110/From:sampleab
+24/05/2026 24/05/2026 a@okhdfcbank/To:gpay-1125627835                                  180.00               0.00          4,66,245.00
+                      0@okbizaxis/UPI
+                      UPI/123634056161/From:sampleab
+24/05/2026 24/05/2026 a@okhdfcbank/To:paytmqr2810050                                   340.00               0.00          4,65,905.00
+                      501011wvmt0oadost@paytm/UPI
+                      UPI/123638246967/From:sampleab
+24/05/2026 24/05/2026 a@okhdfcbank/To:qpayee0008@ybl                                    80.00               0.00          4,65,825.00
+                      /UPI
+                      UPI/123640700748/From:sampleab
+24/05/2026 24/05/2026 a@okhdfcbank/To:paytm.s21huii@                                   150.00               0.00          4,65,675.00
+                      pty/UPI
+                      UPI/614643097762/From:sampleab
+26/05/2026 26/05/2026 a-1@okaxis/To:9600000005@ptsbi/                                   52.00               0.00          4,65,623.00
+                      UPI
+                      UPI/651501968285/From:sampleab
+29/05/2026 29/05/2026 a-1@okaxis/To:payee2upi@o                                550.00               0.00          4,65,073.00
+                      kicici/UPI
+                      UPI/123920793536/From:sampleab
+30/05/2026 30/05/2026 a@okhdfcbank/To:amzn-dvpv82wa                                    998.00               0.00          4,64,075.00
+                      8am@rapl/UPI
+                      UPI/123987902807/From:sampleab
+                      a@okhdfcbank/To:vendorservices.
+31/05/2026 31/05/2026                                                                 1,200.00              0.00          4,62,875.00
+                      payu@hdfcbank/Payment to VENDOR
+                      247
+                      UPI/651745666558/From:sampleab
+31/05/2026 31/05/2026 a-1@okaxis/To:paytm-51955531@pt                                  750.00               0.00          4,62,125.00
+                      ys/UPI
+
+
+ Opening Balance : 5,00,000.00      Total Withdrawals : 37,875.00     Total Deposits: 0.00         Closing Balance : 4,62,125.00
+
+
+
+
+Say "Hi" on +91 82912 01200 for     YES TOUCH PhoneBanking Number:
+WhatsApp Banking                    1800 1200 (Toll Free for Mobile & Landlines in India)
+Email us at yestouch@yes.bank.in    +91 22 5079 5101 (When calling from Outside India)
+                                    Toll Free number from USA: 18333800149
+CIN: L65190MH2003PLC143249          Canada: 18334910559 | UK: 8000489153 | UAE: 800035702510
+
+
+                                                                                                                                   Page 4 of 8
+Mandatory disclaimer:
+Under Goods and Services Tax(GST) applicable from 1st July 2017, the existing service tax on our banking services rendered has been replaced
+by a GST rate of 18%. For any assistance required,Please contact a YES BANK branch official.
+Please refer to Important Messages related to your account, at the end of your account.
+                            Transaction codes in your account statement
+ ATW/CSW/ATD/ATI - ATM Withdrawal                     OBD / OBC - Mobile Funds Transfer
+ AFD / AFC - ATM Funds Transfer                        PCD - Purchased
+ R - RET - UTR - Returned RTGS                         R - UTR - RTGS Transaction
+Have you registered a nominee in your account?* If not, do it NOW!
+Benefits of Nomination : Financial Security | Hassle-Free Fund Transfer | Avoids Legal Complexities | Time Saving & Cost Effective
+
+*Please ignore if nominee already added or not applicable
+
+Please check the entries in the statement and in case of any discrepancies, report the same within 30 days by visiting the nearest YES BANK
+branch or calling on our YES TOUCH toll free number 1800 1200. Unless the discrepancy/errors/omission/unauthorized debits are
+immediately brought to the bank’s notice, the entries in the statement shall be deemed to be correct and shall bind the constituent for all
+purposes and intents.
+
+                                           TERM DEPOSITS DETAILS AS ON 31/05/2026
+  MOCKITO SAMPLE                                      Fixed Deposit No : 806740400000000
+
+
+  Joint Account Holder 1 :         NOT APPLICABLE                           Nominee(s) :           DUMMY DUMMY DUMMY
+  Joint Account Holder 2 :         NOT APPLICABLE                           Deposit type :         FD - REINVESTMENT RESIDENT
+  Principal Payment Instruction : Renew                                     Interest Instruction : Transfer to CASA -806791900000000
+
+
+                         Current
+    FD Opening                             Interest          Interest        Interest                  Maturity           Maturity
+                         Principal                                                         Tenor
+       Date                              Compounded*         Accured*          Rate                     Date              Amount**
+                         Amount
+
+     17/08/2025          9,99,999.99        99,999.99          999.99          9.99     18 Months     17/02/2027          9,99,999.99
+
+
+ *Interest Compounded as on last Quarter (Applicable in case of Reinvestment Accounts) *Interest accured as on
+ date ** Maturity amount is subject to TDS , if applicable. The maturity amount may change in case of any
+ partial/full premature withdrawal of the term deposit. The maturity amount shown herein is basis the original
+ principal amount and contracted tenure for which the Fixed Deposit was booked. Please contact your
+ Relationship Manager or Branch for any query.
+
+                                           TERM DEPOSITS DETAILS AS ON 31/05/2026
+  MOCKITO SAMPLE                                      Fixed Deposit No : 806738400000000
+
+
+  Joint Account Holder 1 :         NOT APPLICABLE                           Nominee(s) :           DUMMY DUMMY DUMMY
+  Joint Account Holder 2 :         NOT APPLICABLE                           Deposit type :         REPO PLUS STD 160 BPS
+  Principal Payment Instruction : Transfer to CASA -806791900000000         Interest Instruction : Transfer to CASA -806791900000000
+
+
+                         Current
+    FD Opening                             Interest          Interest        Interest                  Maturity           Maturity
+                         Principal                                                         Tenor
+       Date                              Compounded*         Accured*          Rate                     Date              Amount**
+                         Amount
+
+     29/12/2025          9,99,999.99        9,999.99          9,999.99         9.99     35 Months     29/11/2028          9,99,999.99
+
+
+
+
+Say "Hi" on +91 82912 01200 for        YES TOUCH PhoneBanking Number:
+WhatsApp Banking                       1800 1200 (Toll Free for Mobile & Landlines in India)
+Email us at yestouch@yes.bank.in       +91 22 5079 5101 (When calling from Outside India)
+                                       Toll Free number from USA: 18333800149
+CIN: L65190MH2003PLC143249             Canada: 18334910559 | UK: 8000489153 | UAE: 800035702510
+
+
+                                                                                                                                          Page 5 of 8
+ *Interest Compounded as on last Quarter (Applicable in case of Reinvestment Accounts) *Interest accured as on
+ date ** Maturity amount is subject to TDS , if applicable. The maturity amount may change in case of any
+ partial/full premature withdrawal of the term deposit. The maturity amount shown herein is basis the original
+ principal amount and contracted tenure for which the Fixed Deposit was booked. Please contact your
+ Relationship Manager or Branch for any query.
+
+                                         TERM DEPOSITS DETAILS AS ON 31/05/2026
+ MOCKITO SAMPLE                                    Fixed Deposit No : 806738400000000
+
+
+ Joint Account Holder 1 :        NOT APPLICABLE                        Nominee(s) :           DUMMY DUMMY DUMMY
+ Joint Account Holder 2 :        NOT APPLICABLE                        Deposit type :         REPO PLUS STD 160 BPS
+ Principal Payment Instruction : Transfer to CASA -806791900000000     Interest Instruction : Transfer to CASA -806791900000000
+
+
+                        Current
+    FD Opening                          Interest          Interest      Interest                   Maturity         Maturity
+                        Principal                                                     Tenor
+       Date                           Compounded*         Accured*        Rate                      Date            Amount**
+                        Amount
+                                                                                   35 Months 27
+    11/08/2025         9,99,999.99        9,999.99         999.99         9.99                    07/08/2028        9,99,999.99
+                                                                                       Days
+
+
+ *Interest Compounded as on last Quarter (Applicable in case of Reinvestment Accounts) *Interest accured as on
+ date ** Maturity amount is subject to TDS , if applicable. The maturity amount may change in case of any
+ partial/full premature withdrawal of the term deposit. The maturity amount shown herein is basis the original
+ principal amount and contracted tenure for which the Fixed Deposit was booked. Please contact your
+ Relationship Manager or Branch for any query.
+
+                                         TERM DEPOSITS DETAILS AS ON 31/05/2026
+ MOCKITO SAMPLE                                    Fixed Deposit No : 806740400000000
+
+
+ Joint Account Holder 1 :        NOT APPLICABLE                        Nominee(s) :           DUMMY DUMMY DUMMY
+ Joint Account Holder 2 :        NOT APPLICABLE                        Deposit type :         FD - REINVESTMENT RESIDENT
+ Principal Payment Instruction : Renew                                 Interest Instruction : Transfer to CASA -806791900000000
+
+
+                        Current
+    FD Opening                          Interest          Interest      Interest                   Maturity         Maturity
+                        Principal                                                     Tenor
+       Date                           Compounded*         Accured*        Rate                      Date            Amount**
+                        Amount
+
+    11/04/2025         9,99,999.99       99,999.99        9,999.99        9.99      18 Months     11/10/2026        9,99,999.99
+
+
+ *Interest Compounded as on last Quarter (Applicable in case of Reinvestment Accounts) *Interest accured as on
+ date ** Maturity amount is subject to TDS , if applicable. The maturity amount may change in case of any
+ partial/full premature withdrawal of the term deposit. The maturity amount shown herein is basis the original
+ principal amount and contracted tenure for which the Fixed Deposit was booked. Please contact your
+ Relationship Manager or Branch for any query.
+
+                                         TERM DEPOSITS DETAILS AS ON 31/05/2026
+ MOCKITO SAMPLE                                    Fixed Deposit No : 806740400000000
+
+
+ Joint Account Holder 1 :        NOT APPLICABLE                        Nominee(s) :           DUMMY DUMMY DUMMY
+ Joint Account Holder 2 :        NOT APPLICABLE                        Deposit type :         FD - REINVESTMENT RESIDENT
+ Principal Payment Instruction : Renew                                 Interest Instruction : Transfer to CASA -806791900000000
+
+
+
+
+Say "Hi" on +91 82912 01200 for      YES TOUCH PhoneBanking Number:
+WhatsApp Banking                     1800 1200 (Toll Free for Mobile & Landlines in India)
+Email us at yestouch@yes.bank.in     +91 22 5079 5101 (When calling from Outside India)
+                                     Toll Free number from USA: 18333800149
+CIN: L65190MH2003PLC143249           Canada: 18334910559 | UK: 8000489153 | UAE: 800035702510
+
+
+                                                                                                                                  Page 6 of 8
+                        Current
+    FD Opening                          Interest           Interest      Interest                  Maturity          Maturity
+                        Principal                                                      Tenor
+       Date                           Compounded*          Accured*        Rate                     Date             Amount**
+                        Amount
+
+    17/08/2025         9,99,999.99       99,999.99         9,999.99        9.99     18 Months     17/02/2027         9,99,999.99
+
+
+ *Interest Compounded as on last Quarter (Applicable in case of Reinvestment Accounts) *Interest accured as on
+ date ** Maturity amount is subject to TDS , if applicable. The maturity amount may change in case of any
+ partial/full premature withdrawal of the term deposit. The maturity amount shown herein is basis the original
+ principal amount and contracted tenure for which the Fixed Deposit was booked. Please contact your
+ Relationship Manager or Branch for any query.
+
+                                         TERM DEPOSITS DETAILS AS ON 31/05/2026
+ MOCKITO SAMPLE                                     Fixed Deposit No : 806740400000000
+
+
+ Joint Account Holder 1 :        NOT APPLICABLE                         Nominee(s) :           DUMMY DUMMY DUMMY
+ Joint Account Holder 2 :        NOT APPLICABLE                         Deposit type :         FD - REINVESTMENT RESIDENT
+ Principal Payment Instruction : Renew                                  Interest Instruction : Transfer to CASA -806791900000000
+
+
+                        Current
+    FD Opening                          Interest           Interest      Interest                  Maturity          Maturity
+                        Principal                                                      Tenor
+       Date                           Compounded*          Accured*        Rate                     Date             Amount**
+                        Amount
+                                                                                    12 Months 1
+    29/03/2026         9,99,999.99         0.00            9,999.99        9.99                   30/03/2027         9,99,999.99
+                                                                                       Days
+
+
+ *Interest Compounded as on last Quarter (Applicable in case of Reinvestment Accounts) *Interest accured as on
+ date ** Maturity amount is subject to TDS , if applicable. The maturity amount may change in case of any
+ partial/full premature withdrawal of the term deposit. The maturity amount shown herein is basis the original
+ principal amount and contracted tenure for which the Fixed Deposit was booked. Please contact your
+ Relationship Manager or Branch for any query.
+
+
+
+
+Say "Hi" on +91 82912 01200 for      YES TOUCH PhoneBanking Number:
+WhatsApp Banking                     1800 1200 (Toll Free for Mobile & Landlines in India)
+Email us at yestouch@yes.bank.in     +91 22 5079 5101 (When calling from Outside India)
+                                     Toll Free number from USA: 18333800149
+CIN: L65190MH2003PLC143249           Canada: 18334910559 | UK: 8000489153 | UAE: 800035702510
+
+
+                                                                                                                                   Page 7 of 8
+IMPORTANT MESSAGE FOR YOU
+
+
+Always keep your profile updated in the bank records to enable us to assist you with best-in-class services. Mobile Number, E-mail ID and Address should be
+updated with the Bank to receive transaction alerts and other correspondence. To safeguard from any misuse, if mobile number is not updated with the Bank,
+the purchase limit on your Debit Card would be reduced to Zero. The ATM withdrawal limits would also be restricted to INR 99,999 or the Product Limit of
+your Debit Card, whichever is lower. Under Liberalized Remittance Scheme, for all international transactions PAN has to be registered and valid, else
+international transactions Debit Card will be disabled.
+Beware of calls that are made in disguise of reward point offers, gift vouchers, holiday coupons, lotteries, Card Activation, Pin Set/Reset etc. to seek your
+confidential card information, Login password or OTP. If you receive any e-mail, SMS, WhatsApp, Link, phone call or voice message, requesting for your
+NetBanking, Mobile Banking, UPI or Card details like User ID, PIN, MPIN, UPI PIN, Password, OTP or Account number. Please do not respond to it, never
+download any Mobile Apps in your phone/system for KYC update or any other reasons on the advice of strangers and inform us at the contact information
+given below. For any online scams, you can report to the bank and additionally report the incident to National Cyber Crime Helpline at 1930 or through online
+portal at www.cybercrime.gov.in For any feedback/complaint, please refer to our Grievance Redressal Policy available on our website - www.yes.bank.in
+For latest interest rates refer to https://www.yes.bank.in/rates-and-charges - Interest rates are subject to change at the sole discretion of YES BANK.You can
+view the Schedule of Charges on our website - https://www.yes.bank.in/rates-and-charges.
+To avail exemption of TDS on your Fixed Deposit (FD)/ Recurring Deposit (RD), submit Form 121 or an Exemption Certificate issued by Income Tax
+Department (as applicable) every Financial Year. In accordance with the Income Tax Act, 2025 TDS will be deducted at a higher rate of 20% (wherever
+applicable) for accounts with missing or Inoperative PAN details. Further, in the absence of PAN details, Form 121 & Exemption Certificates will be deemed
+invalid. You can visit the branch to submit Form 121.
+Doorstep Banking facility is available for all senior citizens (above 60 yrs), visually Impaired and differently abled customers. For details refer the link -
+https://www.yes.bank.in/pdf/doorstep_banking_for_senior_citizens_pdf
+With effect 01st April'26 as per the Section 393(3)[Table: S.No. 5] and 393(4)[Table: S.No. 18] of the Income Tax Act, 2025 TDS will be deducted @ 2% from the
+aggregate cash withdrawals exceeding INR 3 Cr for Co-operatives and INR 1 Cr for others. TDS will be deducted on total cash withdrawal once the cash
+withdrawal limit exceeds above limit i.e. INR 3 Cr and INR 1 Cr respectively. In case the PAN is inoperative i.e. PAN-Aadhar not linked , TDS will be deducted
+@ 20%, once the cash withdrawal limit exceeds INR 3 Cr for Co-operatives and INR 1 Cr for others.
+All Deposits made by YES BANK customers are covered under the Deposit Insurance and Credit Guarantee Corporation (DICGC) scheme for a maximum
+amount of up to INR 5 lakhs per customer, subject to applicable regulatory/statutory guidelines as amended from time to time.
+You can access the Banking Codes and Standards on our website www.yes.bank.in
+If your mobile number is not updated with the Bank, purchase limits on the Debit Card would be reduced to Zero and ATM withdrawal limits would be
+restricted to INR 99,999.Under Liberalized Remittance Scheme (LRS), Valid PAN is mandatory for all international remittances. If valid PAN is not provided to
+the Bank, then international remittances on your Debit Card will be disabled. Section 206C(1G) of Income-tax Act, 1961 deals with the applicable Tax at Source
+(TCS) rates on international remittances under LRS.No Tax at Source (TCS) is applicable on any international remittance/s under LRS, if such remittance/s
+is/are less than INR 7 lakh in a financial year (FY). Where international remittance/s under LRS (other than medical treatment and overseas education) exceeds
+INR 7 lakh in a FY then TCS would be applicable @ 20%. TCS @ 0.5% will be applicable in case of remittance/s towards overseas education being made out of
+loan obtained from a financial institution, exceeding INR 7 lakh in a FY. TCS will be applicable @ 5% on remittance/s for overseas education which is not
+financed by loan from a financial institution or, for medical treatment, exceeding INR 7 lakh in a FY. For more details, please visit the following link
+https://www.yes.bank.in/personal-banking/yes-individual/outward-remittance
+For any technical support required for Cash Management Services, please email to Corporate.TechSupport@yes.bank.in or call 1800 102 3357 (Toll Free) or (022)
+3347 7181.
+Kindly update your Re-KYC by visiting your nearest YES BANK branch. Kindly ignore if already updated.
+
+
+
+
+Say "Hi" on +91 82912 01200 for            YES TOUCH PhoneBanking Number:
+WhatsApp Banking                           1800 1200 (Toll Free for Mobile & Landlines in India)
+Email us at yestouch@yes.bank.in           +91 22 5079 5101 (When calling from Outside India)
+                                           Toll Free number from USA: 18333800149
+CIN: L65190MH2003PLC143249                 Canada: 18334910559 | UK: 8000489153 | UAE: 800035702510
+
+
+                                                                                                                                                            Page 8 of 8
+
