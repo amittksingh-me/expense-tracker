@@ -350,8 +350,8 @@ the card totals and each bank's `Bank Debits` / `Credits/Transfers` — and **ne
 updated regardless of any manual edits** (manual notes belong only in `Comments`); credit-card
 columns in particular are updated **whenever the review sheet is (re)generated** (first run /
 `regenerate`), since only bank-derived figures are gated behind verification. During an upsert,
-**only accounts with a statement processed in the current run are updated**; all other system-owned
-cells retain their existing values. If no row exists for that month, a new row is **appended at the
+**only the system-owned cells for accounts with statements processed in the current run are
+updated**; all other system-owned cells retain their existing values. If no row exists for that month, a new row is **appended at the
 bottom** — the matrix only grows downward and rows are **never re-sorted** (months are processed in
 order, so the latest is always last; a rare back-filled month also simply appends). A newly
 appended row carries the previous matrix row's **cell formatting** (number formats, borders, fills,
