@@ -20,7 +20,7 @@
 
 ## PDF extraction & decryption
 
-- **`pdftotext -layout` (poppler) is the target-state extractor**, behind a `PdfTextExtractor`
+- **`pdftotext -layout` (poppler) is the extractor**, behind a `PdfTextExtractor`
   interface. Rationale: `-layout` preserves the visual **column alignment**, which is what makes
   the bank transaction table parseable; PDFBox's default text stripping collapses columns and
   would need custom positional code to match it.
@@ -283,25 +283,29 @@ Two notes on the table:
 - Fixtures contain **real statement data** → keep local; if the repo is ever put under git, add
   the fixtures folder to `.gitignore`.
 
-## Build sequence (risk-first)
+## Build sequence (risk-first) — delivered
 
-1. **Bank parsing** (current phase) — prove the hardest, most uncertain part via fixtures + tests.
-2. Card parsing (trivial: one field).
-3. POI round-trip on a copy of the real workbook (don't corrupt formulas/other sheets).
-4. Vertical slice: one bank end-to-end into the matrix.
-5. Transactions sheet + status state machine + review loop.
-6. Credit-card reconciliation.
-7. Generalize: multiple accounts, config-driven, pins, error-handling polish.
+The system was built hardest-first; **all phases below are complete** (status: Implemented).
+Remaining work is under **Deferred / open**.
+
+1. ✅ **Bank parsing** — the hardest, most uncertain part, proven via fixtures + characterization tests.
+2. ✅ Card parsing (one field: `Total Amount Due`).
+3. ✅ POI round-trip on a copy (native formulas + other sheets preserved; original never modified).
+4. ✅ Vertical slice: one bank end-to-end into the matrix.
+5. ✅ Transactions sheet + status state machine + review loop (pending / complete / regenerate).
+6. ✅ Credit-card reconciliation (+ the three-state yellow/green/amber card colour).
+7. ✅ Generalize: multiple accounts, config-driven dispatch, pinned overrides, config + matrix
+   integrity validation, processed-PDF archival, fail-loud error handling.
 
 ## Deferred / open
 
 - **AXIS CC** statement is image-only — needs OCR (or manual entry); ignored for now.
 - **Packaging** — a single runnable (shaded) jar; today it runs via `exec:java` / IntelliJ.
-- **Generic `BankFormat`** model — extracted later only if more banks justify it.
-- **Pinned overrides** persist only within a review cycle (date-keyed); no cross-month store.
-- **Workbook-level acceptance tests** — `WorkbookServiceAcceptanceTest` now drives the workbook
-  mechanics (upsert, card two-state colour, reconcile/green-overwrite, Transactions/status
-  round-trip) over a synthetic sheet. An Orchestrator full-cycle harness (first → complete →
-  regenerate, needing PDFs/Keychain) is still verified manually via `exec:java`.
-- **Multi-error reporting** — the run currently aborts on the *first* error (no partial writes);
-  accumulating all discovery/parse errors into one report is a possible future improvement.
+- **Generic `BankFormat`** model — the per-bank parser is a `switch` today; extract a layout-driven
+  `BankFormat` only if more banks justify it (the dispatch is trivial; parser logic is the real cost).
+- **Orchestrator full-cycle acceptance test** — `WorkbookServiceAcceptanceTest` already covers the
+  workbook mechanics (upsert, three-state colour, reconcile/green-overwrite, Transactions/status,
+  duplicate-month detection) over a synthetic sheet. A first → complete → regenerate harness driving
+  the whole `Orchestrator` (needs PDFs/Keychain) is still verified manually via `exec:java`.
+- **Multi-error reporting** — the run aborts on the *first* error (never partial writes); collecting
+  all discovery/parse errors into one report is a possible future nicety.
