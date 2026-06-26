@@ -121,6 +121,14 @@ formulas**, never written as static values.
 > The **card-cell verification colour (yellow/green/amber) is also system-owned formatting** — it is set
 > by the system and may be updated on later runs, so it should not be hand-edited.
 
+**Layout reference.** A ready-to-use, **unencrypted, placeholder-only** template of this sheet lives
+at [`docs/sample/expenses-template.xlsx`](sample/expenses-template.xlsx) (see
+[`docs/sample/README.md`](sample/README.md)). The layout spans **three header rows**: row 1 holds the
+**bank-group labels** (one over each triplet), row 2 holds **`Date`**, the **card labels**,
+**`Comments`**, each bank's **`Bank Debits` / `Credits/Transfers` / `Net Expenses`** triplet, and the
+derived columns; data rows start at row 3 (one per month). Columns are found **by header name**, so
+order is flexible and the layout isn't hard-coded.
+
 ## Bank-account transaction processing — **bank accounts only**
 
 Transaction tagging applies **only to `bank account` type**. Credit cards are never itemized
