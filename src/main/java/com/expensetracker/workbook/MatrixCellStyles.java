@@ -17,7 +17,7 @@ import java.util.Map;
  * Builds and caches the matrix cell styles and detects the verified-green fill — the single place
  * that knows the card-cell colour conventions:
  * <ul>
- *   <li><b>base</b> — no fill; keeps the reference row's font/number-format (for bank figures + formulas);
+ *   <li><b>base</b> — mirrors the reference row's font, number format, borders, and fill (for bank figures + formulas);
  *   <li><b>unverified</b> — light yellow (fresh card amount, not yet reconciled);
  *   <li><b>amber</b> — light orange (a previously-verified value overwritten by a newer statement);
  *   <li><b>verified</b> — green (confirmed against the bank debit), cloned from an existing green
@@ -44,16 +44,19 @@ final class MatrixCellStyles {
         this.verifiedStyle = buildVerified(firstDataRow);
     }
 
-    /** Style for {@code col} cloned from the reference row (font/number format), fill removed. */
+    /**
+     * Style for {@code col} cloned from the reference row's cell in that column — so an appended row
+     * keeps the existing rows' **font, number format, borders, and background fill** (column shading).
+     * (Card columns never use this directly; they overlay yellow/amber/green on top.)
+     */
     CellStyle base(int col) {
         return baseCache.computeIfAbsent(col, c -> {
             CellStyle s = wb.createCellStyle();
             Row rr = refRow >= 0 ? sheet.getRow(refRow) : null;
             Cell ref = rr == null ? null : rr.getCell(c);
             if (ref != null) {
-                s.cloneStyleFrom(ref.getCellStyle());
+                s.cloneStyleFrom(ref.getCellStyle());   // preserves fill/borders/format of the row above
             }
-            s.setFillPattern(FillPatternType.NO_FILL);
             s.setWrapText(false);
             return s;
         });

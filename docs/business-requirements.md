@@ -98,7 +98,11 @@ Columns, in order (for the current 4-card / 4-bank configuration):
 | `Year` | Calendar year of the row; groups Median/Average |
 | `Average Expense` | Average of `Total Expenses` across all rows of the same `Year` |
 
-Formulas:
+Formulas (these are the **canonical definitions**, used verbatim when the system has to create a
+formula from scratch — i.e. the very first row of an empty matrix. On every subsequent row the
+system **copies the previous row's formula** instead, so if a column has been **hand-customized**
+in the workbook — e.g. a `Net Expenses` formula with an extra adjustment term or a cross-sheet
+reference — that customization **carries forward** and is never overwritten; see *Upsert* below):
 - `Net Expenses (per bank) = Bank Debits − Credits/Transfers`
 - `Net Bank Expenses = Σ Net Expenses (banks)`
 - `CC Expense = Σ card columns`
@@ -362,11 +366,15 @@ columns in particular are updated **whenever the review sheet is (re)generated**
 updated**; all other system-owned cells retain their existing values. If no row exists for that month, a new row is **appended at the
 bottom** — the matrix only grows downward and rows are **never re-sorted** (months are processed in
 order, so the latest is always last; a rare back-filled month also simply appends). A newly
-appended row carries the previous matrix row's **cell formatting** (number formats, borders, fills,
-fonts) and the **same live Excel formulas** in every formula-driven column, **adjusted to the new
-row's references**, so workbook calculations continue automatically; only the **system-owned input
-cells** are then written with the new values. (Conditional formatting is range-based in Excel, so
-a new row within the range is covered automatically.)
+appended row is created by **copying the previous matrix row** — its **cell formatting** (number
+formats, borders, fills, fonts) **and its formula-driven columns, with every Excel reference shifted
+to the new row** — so calculations continue automatically and **any hand-customized formula carries
+forward unchanged** (the system never rewrites a formula cell). The system then writes only the
+**system-owned input cells** with the new values; the manual **`Comments`** cell is left **blank**,
+and any account with **no statement this run keeps its input cell blank** (it is *not* inherited
+from the prior month). The one exception is the **very first row of an empty matrix** — there is no
+row to copy, so the system writes the **canonical formulas defined above**. (Conditional formatting
+is range-based in Excel, so a new row within the range is covered automatically.)
 
 Card cells carry the **three-state colour** described under reconciliation: **yellow (unverified)**
 when freshly written, **green (verified)** once confirmed against the bank debit, and **amber
