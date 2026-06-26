@@ -245,7 +245,7 @@ Worked example — ₹10,000 moved from Bank 1 → Bank 2 (both the user's accou
   specific card (the **same matching used to write the `System Note`** at processing time, so a
   payment's card is resolved by one shared rule) and compared to that card's **immediately prior
   month** column (reconciliation looks only one month back — it does not search further). If they differ
-  (refund/adjustment), the **prior month's card column is updated** to the actual amount; the
+  (refund/adjustment), the **prior month's system-owned card cell is updated** to the actual amount; the
   verified cell is marked **green** so the human can trust it. **Reconciliation operates only on
   unverified (yellow) or revised (amber) card cells; verified (green) cells are ignored. A newer
   statement rewrites the cell in yellow/amber (see above), which makes it eligible for
@@ -290,7 +290,8 @@ human verification of the tags first, so they flow through the Transactions shee
      copy) in the working directory, preserving all sheets — the input is **never modified**. The
      system reads/writes **only the configured master sheet** plus the sheets it manages (the
      Transactions sheet and the `Control` status sheet); any other user sheets are untouched.
-   - Write **credit-card** totals directly into the main matrix (billing-date → month row).
+   - Write **credit-card** totals directly into the main matrix (billing-date → month row,
+     creating or updating that row as defined under **Upsert**).
    - Add a **Transactions sheet** containing all **bank** transactions with best-guess tags.
    - Set verification status = **`pending`**.
 2. **Working copy present, status = `pending`:** leave it untouched — wait for the human. **If the
@@ -342,7 +343,7 @@ existing row if present, otherwise appends a new one** (never producing a duplic
 system always works on a **copy** (never master), re-processing is safe rather than something to
 prevent. On overwrite, the system rewrites its system-owned cells (a re-written **card** cell
 re-enters the **unverified/yellow** state — or **amber** if it was previously verified (green) —
-itself the cue that it awaits re-reconciliation; **bank** figures carry no separate highlight). The override touches **only system-owned cells** —
+itself the cue that it awaits re-reconciliation; **bank** figures carry no separate highlight). The update touches **only system-owned cells** —
 the card totals and each bank's `Bank Debits` / `Credits/Transfers` — and **never** the manual
 `Comments` or the formula columns. These system-owned cells are **authoritative outputs —
 overwritten regardless of any manual edits** (manual notes belong only in `Comments`); credit-card
