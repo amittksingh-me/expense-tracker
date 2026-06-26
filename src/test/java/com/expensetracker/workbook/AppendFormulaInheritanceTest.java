@@ -17,7 +17,6 @@ import java.time.YearMonth;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Option (b): an appended month inherits the previous row's formulas (references shifted), so
@@ -97,16 +96,21 @@ class AppendFormulaInheritanceTest {
     }
 
     @Test
-    void copyHandlesArrayFormulaRows() throws Exception {
+    void everyFormulaColumnCarriesForwardShifted() throws Exception {
         try (Workbook wb = headersOnly()) {
             Sheet s = wb.getSheet(SHEET);
-            Row seed = s.createRow(3);
+            Row seed = s.createRow(3);                                  // Excel row 4
             Cell d = seed.createCell(0);
             d.setCellValue(LocalDate.of(2026, 1, 1));
             d.setCellStyle(dateStyle(wb));
-            seed.createCell(5).setCellFormula("D4-E4");
-            seed.createCell(10).setCellFormula("YEAR(A4)");
-            s.setArrayFormula("MEDIAN(IF($K$4:$K$500=K4,$H$4:$H$500))", new CellRangeAddress(3, 3, 9, 9));
+            // a formula in EVERY derived column the spec calls a formula
+            seed.createCell(5).setCellFormula("D4-E4");                 // Net Expenses (per bank)
+            seed.createCell(6).setCellFormula("F4");                    // Net Bank Expenses
+            seed.createCell(7).setCellFormula("G4+I4");                 // Total Expenses
+            seed.createCell(8).setCellFormula("SUM(B4:B4)");           // CC Expense
+            seed.createCell(10).setCellFormula("YEAR(A4)");           // Year
+            s.setArrayFormula("MEDIAN(IF($K$4:$K$500=K4,$H$4:$H$500))", new CellRangeAddress(3, 3, 9, 9));   // Median
+            s.setArrayFormula("AVERAGE(IF($K$4:$K$500=K4,$H$4:$H$500))", new CellRangeAddress(3, 3, 11, 11)); // Average
 
             WorkbookService svc = open(wb);
             // appending must not choke on the array-formula row it copies
@@ -114,8 +118,13 @@ class AppendFormulaInheritanceTest {
                     new MonthlyFigure("Bank", YearMonth.of(2026, 2), new BigDecimal("200.00"), new BigDecimal("20.00"))));
 
             LocalDate feb = LocalDate.of(2026, 2, 1);
-            assertEquals("D5-E5", at(wb, feb, 5).getCellFormula());   // simple per-bank net shifted
-            assertNotNull(at(wb, feb, 9));                            // Median cell carried over
+            assertEquals("D5-E5", at(wb, feb, 5).getCellFormula());                  // Net Expenses
+            assertEquals("F5", at(wb, feb, 6).getCellFormula());                     // Net Bank Expenses
+            assertEquals("G5+I5", at(wb, feb, 7).getCellFormula());                  // Total Expenses
+            assertEquals("SUM(B5:B5)", at(wb, feb, 8).getCellFormula());            // CC Expense
+            assertEquals("YEAR(A5)", at(wb, feb, 10).getCellFormula());             // Year
+            assertEquals("MEDIAN(IF($K$4:$K$500=K5,$H$4:$H$500))", at(wb, feb, 9).getCellFormula());   // Median (array)
+            assertEquals("AVERAGE(IF($K$4:$K$500=K5,$H$4:$H$500))", at(wb, feb, 11).getCellFormula()); // Average (array)
         }
     }
 }
