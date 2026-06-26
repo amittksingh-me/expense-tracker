@@ -293,7 +293,10 @@ human verification of the tags first, so they flow through the Transactions shee
    - Write **credit-card** totals directly into the main matrix (billing-date → month row).
    - Add a **Transactions sheet** containing all **bank** transactions with best-guess tags.
    - Set verification status = **`pending`**.
-2. **Working copy present, status = `pending`:** leave it untouched — wait for the human.
+2. **Working copy present, status = `pending`:** leave it untouched — wait for the human. **If the
+   status is `pending` but the Transactions sheet is *missing*** (e.g. accidentally deleted), the
+   workbook is **inconsistent** and the run **aborts** rather than silently rebuilding — the human
+   recovers by setting status = `regenerate` (which is allowed to rebuild from scratch).
 3. **Working copy present, status = `complete`:** compute the month row(s) from the reviewed
    tags, **push the figures into the main matrix sheet**, **apply CC reconciliation** to the
    prior month's card column(s) (using the now-verified `cc-payment` debits), **delete the
@@ -305,7 +308,9 @@ human verification of the tags first, so they flow through the Transactions shee
    (Re-running once finalized — Transactions sheet already removed — is a **no-op**.)
 4. **Working copy present, status = `regenerate`:** discard the current Transactions sheet,
    re-extract and re-tag from the statements **using the current (updated) configuration**
-   (re-applying any `pinned` overrides), and set status back to **`pending`**.
+   (re-applying any `pinned` overrides), and set status back to **`pending`**. Unlike `pending`,
+   `regenerate` **tolerates a missing Transactions sheet** — rebuilding it is exactly its job (there
+   are simply no pins to recover), so it is the recovery path for an accidentally-deleted sheet.
 
 **Credit-card totals are re-imported whenever the review sheet is generated** — i.e. on a
 **first run** and on **`regenerate`** (they are authoritative statement outputs, not part of the
@@ -325,8 +330,10 @@ Only **unprocessed PDFs in the working directory are active inputs** — this pr
 double-processing and keeps an audit trail. Discovery scans the working directory
 **non-recursively**, so the `processed/` archive is never re-scanned. (PDFs
 are deliberately **not** moved on first-run/`regenerate`, because `regenerate` still needs them.)
-The output workbook copy is left in place for the human to copy back; once finalized, a further
-`complete` run is a **no-op** (the Transactions sheet is already gone, and the PDFs are archived).
+**Archived PDFs are retained indefinitely — the system never automatically deletes them** (cleanup
+of old archives, if ever wanted, is a manual human step). The output workbook copy is left in place
+for the human to copy back; once finalized, a further `complete` run is a **no-op** (the
+Transactions sheet is already gone, and the PDFs are archived).
 
 ### Re-processing an existing month (upsert)
 Month rows are keyed by the `Month Key`, which **uniquely identifies a matrix row — at most one
@@ -345,9 +352,11 @@ columns in particular are rewritten **whenever the review sheet is (re)generated
 retain their existing values. If no row exists for that month, a new row is **appended at the
 bottom** — the matrix only grows downward and rows are **never re-sorted** (months are processed in
 order, so the latest is always last; a rare back-filled month also simply appends). **A newly
-appended row carries the same **Excel formulas and cell formatting** as the previous matrix row in
-every formula-driven column, with formulas adjusted for the new row, so workbook calculations
-continue automatically.**
+appended row carries the previous matrix row's **cell formatting** (number formats, borders, fills,
+fonts) and the **same live Excel formulas** in every formula-driven column, **adjusted to the new
+row's references**, so workbook calculations continue automatically; only the **system-owned input
+cells** are then written with the new values.** (Conditional formatting is range-based in Excel, so
+a new row within the range is covered automatically.)
 
 Card cells carry the **three-state colour** described under reconciliation: **yellow (unverified)**
 when freshly written, **green (verified)** once confirmed against the bank debit, and **amber

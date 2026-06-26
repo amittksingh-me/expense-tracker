@@ -130,8 +130,17 @@ public final class Orchestrator {
                     wb.save(output, master);
                     log.info("STATUS=regenerate -> review surface rebuilt (pins re-applied); back to pending.");
                 }
-                default -> log.info("STATUS=pending -> awaiting review. "
-                        + "Set Control!B1 = complete or regenerate, then re-run.");
+                default -> {
+                    // pending claims a review sheet exists; if it's gone the workbook is inconsistent
+                    // (don't silently rebuild after an accidental edit). regenerate is the recovery path.
+                    if (!wb.hasTransactionsSheet()) {
+                        throw new IllegalStateException("STATUS=" + state + " but the Transactions sheet "
+                                + "is missing — workbook is inconsistent. Set Control!B1 = regenerate to "
+                                + "rebuild the review sheet from the statements.");
+                    }
+                    log.info("STATUS=pending -> awaiting review. "
+                            + "Set Control!B1 = complete or regenerate, then re-run.");
+                }
             }
         } catch (RuntimeException e) {
             throw e;
