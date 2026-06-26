@@ -10,8 +10,9 @@
   starts, processes a handful of statements, writes the workbook, exits. Spring Boot's value
   (DI-at-scale, embedded server, autoconfig, lifecycle) buys nothing here and adds startup
   cost/weight. The dependency graph is small and fixed → **manual wiring in `main()`**.
-- **CLI args:** plain `args[]` — an optional config-file path (defaults to the classpath
-  `config.yaml`). No other flags yet; picocli only if the option set grows.
+- **CLI args:** plain `args[]` — an optional config-file path. With no arg, `Main` loads config
+  from the classpath, **preferring `config.local.yaml` (real, gitignored) and falling back to the
+  committed `config.yaml` template**. No other flags yet; picocli only if the option set grows.
 - **Build:** **Maven**. Run via `exec:java` or the IntelliJ run config; a single runnable
   (shaded) jar is deferred.
 - **Logging:** SLF4J via **slf4j-simple → stdout** (configured in `simplelogger.properties`);
@@ -20,7 +21,7 @@
 
 ## PDF extraction & decryption
 
-- **`pdftotext -layout` (poppler) is the target-state extractor**, behind a `PdfTextExtractor`
+- **`pdftotext -layout` (poppler) is the extractor**, behind a `PdfTextExtractor`
   interface. Rationale: `-layout` preserves the visual **column alignment**, which is what makes
   the bank transaction table parseable; PDFBox's default text stripping collapses columns and
   would need custom positional code to match it.
@@ -56,7 +57,7 @@
 
 ## Configuration & secrets
 
-- **Config in YAML** (Jackson or SnakeYAML): accounts, mandates, paths (+ master sheet name),
+- **Config in YAML** (SnakeYAML): accounts, mandates, paths (+ master sheet name),
   and the ordered tagging rules. Parsed into typed records, **validated up front (fail-loud)** in
   `ConfigLoader.validate`: duplicate labels, a card mandate → unknown bank, or an active card
   missing its payment pattern. (PDF-pattern ambiguity is left to discovery's run-time multi-match
@@ -69,8 +70,8 @@ A unique friendly **Label** per account is the single key used consistently acro
 **matrix column(s)**, the Transactions **`Bank` column**, **mandates**, and the **Keychain**
 (service `expense-tracker`, account = the Label, read via `security find-generic-password`). Because
 it drives a distinct matrix column it must be unique — which is how two same-issuer cards stay
-separate. **The concrete labels live in `config.yaml`, not here**, so the design stays generic when
-accounts are added or renamed.
+separate. **The concrete labels live in the config file (`config.local.yaml`, or the `config.yaml`
+template), not here**, so the design stays generic when accounts are added or renamed.
 
 The Label is independent of the **PDF-match pattern**, the card **payment-identification pattern**,
 and the **password** — those are separate per-account fields. One extra Keychain key, **`MASTER`**,
@@ -78,9 +79,12 @@ holds the workbook password (the input/output Excel is encrypted at rest; the sa
 fetches it to open and re-save the workbook).
 
 ### Run configuration (current setup; all config-driven)
-- **Config file:** `src/main/resources/config.yaml` (loaded from the classpath; pass a path
-  argument to `Main`/`exec.args` to override with an external file).
-- **Input workbook and output** both point at the working directory `~/Downloads/working`.
+- **Config file:** the committed `src/main/resources/config.yaml` is a **placeholder template**;
+  real values live in `src/main/resources/config.local.yaml` (**gitignored**). `Main` auto-loads
+  `config.local.yaml` from the classpath when present, else the template; an explicit path
+  argument (`Main`/`exec.args`) overrides both.
+- **Input workbook and output** both point at the configured working directory (a local folder);
+  the template uses a placeholder path, the real path lives in `config.local.yaml`.
 - **Master matrix sheet name:** `Expenses`.
 - **Month row key:** the workbook uses **1st-of-month** dates (`01-May-2026`), not end-of-month.
   (Older 2025 rows use end-of-month; new appends follow the current 2026 convention.)
@@ -283,25 +287,29 @@ Two notes on the table:
 - Fixtures contain **real statement data** → keep local; if the repo is ever put under git, add
   the fixtures folder to `.gitignore`.
 
-## Build sequence (risk-first)
+## Build sequence (risk-first) — delivered
 
-1. **Bank parsing** (current phase) — prove the hardest, most uncertain part via fixtures + tests.
-2. Card parsing (trivial: one field).
-3. POI round-trip on a copy of the real workbook (don't corrupt formulas/other sheets).
-4. Vertical slice: one bank end-to-end into the matrix.
-5. Transactions sheet + status state machine + review loop.
-6. Credit-card reconciliation.
-7. Generalize: multiple accounts, config-driven, pins, error-handling polish.
+The system was built hardest-first; **all phases below are complete** (status: Implemented).
+Remaining work is under **Deferred / open**.
+
+1. ✅ **Bank parsing** — the hardest, most uncertain part, proven via fixtures + characterization tests.
+2. ✅ Card parsing (one field: `Total Amount Due`).
+3. ✅ POI round-trip on a copy (native formulas + other sheets preserved; original never modified).
+4. ✅ Vertical slice: one bank end-to-end into the matrix.
+5. ✅ Transactions sheet + status state machine + review loop (pending / complete / regenerate).
+6. ✅ Credit-card reconciliation (+ the three-state yellow/green/amber card colour).
+7. ✅ Generalize: multiple accounts, config-driven dispatch, pinned overrides, config + matrix
+   integrity validation, processed-PDF archival, fail-loud error handling.
 
 ## Deferred / open
 
 - **AXIS CC** statement is image-only — needs OCR (or manual entry); ignored for now.
 - **Packaging** — a single runnable (shaded) jar; today it runs via `exec:java` / IntelliJ.
-- **Generic `BankFormat`** model — extracted later only if more banks justify it.
-- **Pinned overrides** persist only within a review cycle (date-keyed); no cross-month store.
-- **Workbook-level acceptance tests** — `WorkbookServiceAcceptanceTest` now drives the workbook
-  mechanics (upsert, card two-state colour, reconcile/green-overwrite, Transactions/status
-  round-trip) over a synthetic sheet. An Orchestrator full-cycle harness (first → complete →
-  regenerate, needing PDFs/Keychain) is still verified manually via `exec:java`.
-- **Multi-error reporting** — the run currently aborts on the *first* error (no partial writes);
-  accumulating all discovery/parse errors into one report is a possible future improvement.
+- **Generic `BankFormat`** model — the per-bank parser is a `switch` today; extract a layout-driven
+  `BankFormat` only if more banks justify it (the dispatch is trivial; parser logic is the real cost).
+- **Orchestrator full-cycle acceptance test** — `WorkbookServiceAcceptanceTest` already covers the
+  workbook mechanics (upsert, three-state colour, reconcile/green-overwrite, Transactions/status,
+  duplicate-month detection) over a synthetic sheet. A first → complete → regenerate harness driving
+  the whole `Orchestrator` (needs PDFs/Keychain) is still verified manually via `exec:java`.
+- **Multi-error reporting** — the run aborts on the *first* error (never partial writes); collecting
+  all discovery/parse errors into one report is a possible future nicety.
