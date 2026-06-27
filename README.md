@@ -16,8 +16,8 @@ discover → extract (pdftotext) → parse (per bank/card) → tag (rules) → a
 
 | Component | Package |
 |---|---|
-| Bank parsers (HDFC, NIYO, YES) | `parser` |
-| Card parsers (HDFC, YES) | `card` |
+| Bank parsers (HDFC, NIYO, YES, ICICI) | `parser` |
+| Card parsers (HDFC, YES, AXIS) | `card` |
 | Tagging engine (config rules, first-match) | `tag` |
 | Aggregator (per-account, per-month figures) | `aggregate` |
 | Reconciler (cc-payment → prior-month card) | `recon` |
@@ -35,7 +35,7 @@ discover → extract (pdftotext) → parse (per bank/card) → tag (rules) → a
 
 ```bash
 security add-generic-password -s expense-tracker -a "HDFC"   -T /usr/bin/security -U -w
-# ... repeat for NIYO, YES, "HDFC CC", "HDFC RUPAY", "YES CC", and MASTER
+# ... repeat for NIYO, YES, ICICI, "HDFC CC", "HDFC RUPAY", "YES CC", "AXIS CC", and MASTER
 ```
 
 ## Configure
