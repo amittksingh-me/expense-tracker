@@ -12,9 +12,10 @@ workingDir:     /path/to/working
 # 'format' selects the statement parser and is separate from 'label' (several accounts can
 # share one format). 'label' drives the matrix column(s); 'pdf' matches the statement file.
 accounts:
-  - { label: HDFC,        type: bank,        format: HDFC_BANK, pdf: 'encrypted_hdfc\.pdf' }
-  - { label: NIYO,        type: bank,        format: NIYO_BANK, pdf: 'encrypted_niyo\.pdf' }
-  - { label: 'YES',       type: bank,        format: YES_BANK,  pdf: 'encrypted_yes\.pdf' }
+  - { label: HDFC,        type: bank,        format: HDFC_BANK,  pdf: 'encrypted_hdfc\.pdf' }
+  - { label: NIYO,        type: bank,        format: NIYO_BANK,  pdf: 'encrypted_niyo\.pdf' }
+  - { label: 'YES',       type: bank,        format: YES_BANK,   pdf: 'encrypted_yes\.pdf' }
+  - { label: ICICI,       type: bank,        format: ICICI_BANK, pdf: 'encrypted_icici\.pdf' }
   - { label: HDFC CC,     type: credit_card, format: HDFC_CARD, pdf: 'encrypted_cc_hdfc\.pdf',        mandateBank: HDFC, paymentPattern: 'XXXX' }
   - { label: HDFC RUPAY,  type: credit_card, format: HDFC_CARD, pdf: 'encrypted_cc_hdfc_2\.pdf',  mandateBank: HDFC, paymentPattern: 'XXXX' }
   - { label: YES CC,      type: credit_card, format: YES_CARD,  pdf: 'encrypted_cc_yes\.pdf',         mandateBank: 'YES',  paymentPattern: 'CREDIT CARD' }

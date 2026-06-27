@@ -14,6 +14,7 @@ import com.expensetracker.discover.StatementOverlap;
 import com.expensetracker.extract.PdfTextExtractor;
 import com.expensetracker.parser.BankStatementParser;
 import com.expensetracker.parser.HdfcBankParser;
+import com.expensetracker.parser.IciciBankParser;
 import com.expensetracker.parser.NiyoBankParser;
 import com.expensetracker.parser.StatementBalanceValidator;
 import com.expensetracker.parser.YesBankParser;
@@ -280,6 +281,7 @@ public final class Orchestrator {
             case "HDFC_BANK", "HDFC" -> new HdfcBankParser();
             case "NIYO_BANK", "NIYO" -> new NiyoBankParser();
             case "YES_BANK", "YES" -> new YesBankParser();
+            case "ICICI_BANK", "ICICI" -> new IciciBankParser();
             default -> throw new IllegalStateException(
                     "No bank parser for format '" + a.formatKey() + "' (account " + a.label() + ")");
         };

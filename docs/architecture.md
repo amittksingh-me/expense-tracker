@@ -145,8 +145,8 @@ CLI (args)
        │                        accounts need NOT have a statement in a run (missing ≠ error)
        ├─ PdfTextExtractor    → `pdftotext -upw -layout` → text lines      [ONE shared component]
        ├─ Parser dispatch (account **format** → per-institution parser; a `switch`)
-       │     • BankStatementParser  (HDFC/NIYO/YES) → transactions + period + totals
-       │     • CardStatementParser  (HDFC/YES)      → billing date + Total Amount Due
+       │     • BankStatementParser  (HDFC/NIYO/YES/ICICI) → transactions + period + totals
+       │     • CardStatementParser  (HDFC/YES/AXIS)        → billing date + Total Amount Due
        ├─ (startup) WorkbookService.duplicateMonthRows → abort if any Month Key appears twice
        ├─ StatementOverlap    → abort if two same-account BANK statements' periods overlap;
        │                        cards abort on a duplicate card+billing-month (both fail-loud)
@@ -309,6 +309,11 @@ Remaining work is under **Deferred / open**.
 8. ✅ AXIS CC parser (`AxisCardParser`) — the statement is text-based after all (not image-only);
    keys off `Total Payment Due` + `Statement Generation Date`, avoiding the illustrative
    `Total Amount Due` MAD example.
+9. ✅ ICICI bank parser (`IciciBankParser`) — **column-by-column** sign with **per-page column
+   detection** (ICICI shifts the columns between pages); multi-line narration buffered onto the
+   dated row (payee sits on the line above the date); and **per-page `Total:` subtotals summed**
+   for the statement totals (there is no statement-wide total). Validated by balance-chaining
+   (`prev ± amount == balance`) plus a page-sum vs extracted-sum cross-check.
 
 ## Deferred / open
 
