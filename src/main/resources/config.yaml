@@ -18,7 +18,7 @@ accounts:
   - { label: HDFC CC,     type: credit_card, format: HDFC_CARD, pdf: 'encrypted_cc_hdfc\.pdf',        mandateBank: HDFC, paymentPattern: 'XXXX' }
   - { label: HDFC RUPAY,  type: credit_card, format: HDFC_CARD, pdf: 'encrypted_cc_hdfc_2\.pdf',  mandateBank: HDFC, paymentPattern: 'XXXX' }
   - { label: YES CC,      type: credit_card, format: YES_CARD,  pdf: 'encrypted_cc_yes\.pdf',         mandateBank: 'YES',  paymentPattern: 'CREDIT CARD' }
-  - { label: AXIS CC,     type: credit_card, format: AXIS_CARD, pdf: 'encrypted_cc_axis\.pdf',        mandateBank: HDFC, paymentPattern: 'Axis', skip: true }
+  - { label: AXIS CC,     type: credit_card, format: AXIS_CARD, pdf: 'encrypted_cc_axis\.pdf',        mandateBank: HDFC, paymentPattern: 'Axis' }
 
 # Tagging rules — readable substrings, first match wins
 rules:
