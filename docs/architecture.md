@@ -113,11 +113,11 @@ fetches it to open and re-save the workbook).
   - `HDFC CC` ← HDFC bank, last-4 `8339`
   - `HDFC RUPAY` ← HDFC bank, last-4 `3787`
   - `YES CC` ← YES bank (only card from YES; pattern `CREDIT CARD`)
-  - `AXIS CC` ← HDFC bank — **ignored for now** (statement is image-only/scanned; no parser).
-- **Reconciliation tolerance:** while Axis is ignored, a `cc-payment` debit that matches **no**
-  configured card is **logged and skipped** (not a hard abort). But **two debits matching the same
-  card for the same prior month abort** (ambiguous double-payment/reversal), and a debit whose
-  prior-month row doesn't exist is **skipped and logged**.
+  - `AXIS CC` ← HDFC bank, pattern `Axis` (`AxisCardParser`).
+- **Reconciliation tolerance:** a `cc-payment` debit that matches **no** configured card is
+  **logged and skipped** (not a hard abort) — e.g. an intentionally `skip`-ped card. But **two
+  debits matching the same card for the same prior month abort** (ambiguous double-payment/reversal),
+  and a debit whose prior-month row doesn't exist is **skipped and logged**.
 
 ## Domain model (vocabulary)
 
@@ -306,10 +306,12 @@ Remaining work is under **Deferred / open**.
 6. ✅ Credit-card reconciliation (+ the three-state yellow/green/amber card colour).
 7. ✅ Generalize: multiple accounts, config-driven dispatch, pinned overrides, config + matrix
    integrity validation, processed-PDF archival, fail-loud error handling.
+8. ✅ AXIS CC parser (`AxisCardParser`) — the statement is text-based after all (not image-only);
+   keys off `Total Payment Due` + `Statement Generation Date`, avoiding the illustrative
+   `Total Amount Due` MAD example.
 
 ## Deferred / open
 
-- **AXIS CC** statement is image-only — needs OCR (or manual entry); ignored for now.
 - **Packaging** — a single runnable (shaded) jar; today it runs via `exec:java` / IntelliJ.
 - **Generic `BankFormat`** model — the per-bank parser is a `switch` today; extract a layout-driven
   `BankFormat` only if more banks justify it (the dispatch is trivial; parser logic is the real cost).

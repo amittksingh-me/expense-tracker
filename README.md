@@ -71,8 +71,9 @@ The original input workbook is never modified; results are written to the config
 - **Review loop built:** `pending` → (human reviews tags / pins one-offs) → `complete` (push to
   matrix, reconcile, verified-green) or `regenerate` (re-tag, pins kept in place). Re-running once
   finalized is a no-op.
-- **AXIS CC** is ignored (its statement is an image/scanned PDF — needs OCR or manual entry).
+- **All four cards parsed**, incl. **AXIS CC** (`AxisCardParser` — the statement is text-based, not
+  image-only as first assumed).
 - **Month key** uses 1st-of-month to match the existing `Expenses` sheet (the spec text says
   end-of-month; the real workbook uses the 1st).
-- **Open items:** AXIS OCR; a packaged jar (runs via `exec:java`/IntelliJ today). See
+- **Open items:** a packaged jar (runs via `exec:java`/IntelliJ today). See
   `docs/architecture.md` → Deferred.
