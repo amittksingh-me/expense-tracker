@@ -1,0 +1,56 @@
+000000/00000000-0000/0-0/RESWS/00-00
+
+
+
+
+SAMPLE TEST USER
+FLAT NO, BUILDING NAME
+AREA MAIN ROAD
+BANGALORE
+KARNATAKA - INDIA - 560000
+
+STATEMENT SUMMARY for Customer ID: XXXXX0000 in INR as on January 31, 2026.
+
+Summary                                                                                                             Balance
+Savings Account Balance                                                                                           14,000.00
+TOTAL                                                                                                             14,000.00
+
+ ACCOUNT DETAILS - INR
+ACCOUNT HOLDERS : SAMPLE TEST USER
+ Savings A/c XXXXXXXX0000                                                                                          14,000.00
+
+Statement of Transactions in Savings Account XXXXXXXX0000 in INR for the period January 01, 2026 - January 31, 2026
+
+DATE         MODE           PARTICULARS                                              DEPOSITS        WITHDRAWALS                       BALANCE
+01-01-2026                  B/F                                                                                                      10,000.00
+                            UPI/SAMPLE PAYEE A/samplea@upi/UPI/SAMPLE
+01-01-2026                  BANK/100000000001/ICI00000000000000000000000000                               100.00                      9,900.00
+                            001/
+04-01-2026                  UPI/SAMPLE PAYEE B/sampleb@upi/UPI/SAMPLE/100000000002                        400.00                      9,500.00
+06-01-2026   MOBILE BANKING MMT/IMPS/100000000003/MOBTXN/SAMPLE USER/Sample Bank     5,000.00                                        14,500.00
+                            UPI/SAMPLE PAYEE C/samplec@upi/UPI/SAMPLE
+07-01-2026                  BANK/100000000004/ICI00000000000000000000000000                               500.00                     14,000.00
+                            004/
+                            Total:                                                   5,000.00           1,000.00                     14,000.00
+
+
+                                                                                                                   Page 1 of 3 M-00000000-00000
+Statement of Transactions in Savings Account XXXXXXXX0000 in INR for the period January 01, 2026 - January 31, 2026
+
+DATE         MODE           PARTICULARS                                              DEPOSITS        WITHDRAWALS                       BALANCE
+                            UPI/SAMPLE PAYEE D/sampled@upi/UPI/SAMPLE
+10-01-2026                  BANK/100000000005/ICI00000000000000000000000000                             2,000.00                     12,000.00
+                            005/
+15-01-2026   MOBILE BANKING MMT/IMPS/100000000006/MOBTXN/SAMPLE USER/Sample Bank     3,000.00                                        15,000.00
+                            UPI/SAMPLE PAYEE E/samplee@upi/UPI/SAMPLE
+20-01-2026                  BANK/100000000007/ICI00000000000000000000000000                             1,000.00                     14,000.00
+                            007/
+                            Total:                                                   3,000.00           3,000.00                     14,000.00
+
+
+                                                                                                                   Page 2 of 3 M-00000000-00000
+
+Legends for transactions in your Account Statement
+ RTGS - Real Time Gross Settlement                NEFT - National Electronic Fund Transfer
+This is a system generated statement. Hence, it does not require any signature.
+                                                                                                                   Page 3 of 3 M-00000000-00000
