@@ -28,9 +28,12 @@ import java.util.regex.Pattern;
  * between pages</b> (the {@code MODE}/{@code PARTICULARS} widths differ page to page).
  *
  * <p><b>Multi-line narration.</b> A transaction's narration wraps across physical lines with the
- * date + amount on the <i>middle</i> one (the payee usually sits on the line <i>above</i> the date).
- * Date-less {@code PARTICULARS} rows are buffered and attached to the next dated row, so the payee is
- * captured. (A row's trailing ref fragment may attach to the following txn — harmless for tagging.)
+ * date + amount on the <i>middle</i> one: the payee usually sits on the line <i>above</i> the date
+ * (the "head", a new {@code UPI/…} narration) and a short ref fragment on the line(s) <i>below</i>
+ * (the "tail", a continuation like {@code 8/}). A head begins the <i>next</i> transaction; a tail
+ * belongs to the <i>current</i> one — they're told apart by whether the fragment starts a new
+ * narration ({@link #isNarrationStart}). So a transaction's description is
+ * {@code head + dated-line PARTICULARS + tail}.
  *
  * <p><b>No statement-wide total.</b> Each page prints its own {@code Total:} subtotal; the statement
  * totals are the <b>sum of the per-page {@code Total:} rows</b>. Opening = the first {@code B/F}
@@ -54,6 +57,11 @@ public final class IciciBankParser implements BankStatementParser {
     private static final Pattern MONEY = Pattern.compile("[\\d,]+\\.\\d{2}");
     private static final Pattern PAGE_MARKER = Pattern.compile("Page\\s+\\d+\\s+of\\s+\\d+");
 
+    /** A narration fragment that <i>starts</i> a new transaction (the head) rather than continuing one. */
+    private static final Pattern NARR_START = Pattern.compile(
+            "^(UPI|MMT|NEFT|RTGS|IMPS|BIL|TOP|ACH|NACH|EBA|ISEC|VPS|IPS|VAT|MAT|NFS|INF|POS|CMS|ATW|ATM|INB|TPT"
+            + "|MOBILE BANKING|INTERNET BANKING)\\b");
+
     @Override
     public String bankLabel() {
         return "ICICI";
@@ -71,10 +79,11 @@ public final class IciciBankParser implements BankStatementParser {
 
         int partCol = -1;
         int depCol = -1;
-        int wdCol = -1;          // amounts left of this x are deposits, at/right are withdrawals
+        int wdCol = -1;                       // amounts ending left of this x are deposits, at/right are withdrawals
         boolean inTable = false;
         BigDecimal prevBalance = null;
-        StringBuilder narration = new StringBuilder();   // buffered wrapped narration for the next dated row
+        StringBuilder head = new StringBuilder();   // narration head pending for the NEXT dated row
+        Draft current = null;                       // the txn currently accumulating its tail
         List<RawBankTxn> txns = new ArrayList<>();
 
         for (String line : lines) {
@@ -98,7 +107,7 @@ public final class IciciBankParser implements BankStatementParser {
                 depCol = line.indexOf("DEPOSITS");
                 wdCol = line.indexOf("WITHDRAWALS");
                 inTable = true;
-                narration.setLength(0);
+                head.setLength(0);
                 continue;
             }
             if (!inTable) {
@@ -113,8 +122,9 @@ public final class IciciBankParser implements BankStatementParser {
                     totalDebits = totalDebits.add(m.get(m.size() - 2).value);     // WITHDRAWALS subtotal
                     closing = m.get(m.size() - 1).value;                          // running balance
                 }
+                current = finalize(current, txns);
+                head.setLength(0);
                 inTable = false;
-                narration.setLength(0);
                 continue;
             }
             if (PAGE_MARKER.matcher(line).find() || trimmed.isEmpty()) {
@@ -131,7 +141,7 @@ public final class IciciBankParser implements BankStatementParser {
                         prevBalance = opening;
                     }
                 }
-                narration.setLength(0);
+                head.setLength(0);
                 continue;
             }
             if (dated) {
@@ -143,13 +153,6 @@ public final class IciciBankParser implements BankStatementParser {
                 Money amt = m.get(m.size() - 2);
                 Sign sign = amt.end < wdCol ? Sign.CREDIT : Sign.DEBIT;   // column → deposit (credit) vs withdrawal (debit)
 
-                String particulars = safeSubstring(line, partCol, depCol).trim();
-                if (!particulars.isEmpty()) {
-                    append(narration, particulars);
-                }
-                String description = narration.toString().trim().replaceAll("\\s+", " ");
-                narration.setLength(0);
-
                 if (prevBalance != null) {                   // balance must chain (cross-checks the column sign)
                     BigDecimal expected = sign == Sign.CREDIT
                             ? prevBalance.add(amt.value) : prevBalance.subtract(amt.value);
@@ -160,14 +163,27 @@ public final class IciciBankParser implements BankStatementParser {
                     }
                 }
                 prevBalance = balance.value;
-                txns.add(new RawBankTxn(LocalDate.parse(d.group(1), DATE), description, amt.value, sign));
+
+                current = finalize(current, txns);           // close the previous txn (with its tail)
+                StringBuilder desc = new StringBuilder(head); // head = narration from the line(s) above the date
+                head.setLength(0);
+                String particulars = safeSubstring(line, partCol, depCol).trim();
+                if (!particulars.isEmpty()) {
+                    append(desc, particulars);
+                }
+                current = new Draft(LocalDate.parse(d.group(1), DATE), amt.value, sign, desc);
                 continue;
             }
 
-            if (isContinuation(line)) {                       // date-less PARTICULARS fragment → buffer for next txn
-                append(narration, trimmed);
+            if (isContinuation(line)) {
+                if (head.length() == 0 && current != null && !isNarrationStart(trimmed)) {
+                    current.append(trimmed);                 // a continuation → tail of the CURRENT txn
+                } else {
+                    append(head, trimmed);                   // a new narration (or its continuation) → next txn's head
+                }
             }
         }
+        current = finalize(current, txns);
 
         if (closing == null) {
             closing = prevBalance;
@@ -183,6 +199,17 @@ public final class IciciBankParser implements BankStatementParser {
 
         return new ParsedBankStatement(accountLast4, periodStart, periodEnd, txns,
                 new PrintedTotals(opening, closing, totalDebits, totalCredits));
+    }
+
+    private static Draft finalize(Draft current, List<RawBankTxn> txns) {
+        if (current != null) {
+            txns.add(current.toTxn());
+        }
+        return null;
+    }
+
+    private static boolean isNarrationStart(String frag) {
+        return NARR_START.matcher(frag).find();
     }
 
     private static boolean isContinuation(String line) {
@@ -212,5 +239,28 @@ public final class IciciBankParser implements BankStatementParser {
     }
 
     private record Money(BigDecimal value, int end) {
+    }
+
+    /** Mutable accumulator for a transaction whose narration spans several lines (head + middle + tail). */
+    private static final class Draft {
+        private final LocalDate date;
+        private final BigDecimal amount;
+        private final Sign sign;
+        private final StringBuilder desc;
+
+        Draft(LocalDate date, BigDecimal amount, Sign sign, StringBuilder desc) {
+            this.date = date;
+            this.amount = amount;
+            this.sign = sign;
+            this.desc = desc;
+        }
+
+        void append(String s) {
+            IciciBankParser.append(desc, s);
+        }
+
+        RawBankTxn toTxn() {
+            return new RawBankTxn(date, desc.toString().trim().replaceAll("\\s+", " "), amount, sign);
+        }
     }
 }
