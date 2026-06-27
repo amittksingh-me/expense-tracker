@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class IciciBankParserTest {
@@ -56,11 +57,20 @@ class IciciBankParserTest {
     }
 
     @Test
-    void wrappedNarrationKeepsThePayee() {
+    void wrappedNarrationKeepsHeadAndTailWithTheirOwnTxn() {
+        // head (line above) + middle (dated line) + tail (line below) all belong to THIS txn
         RawBankTxn first = byAmount("100.00");
         assertEquals(Sign.DEBIT, first.sign());
         assertTrue(first.description().contains("SAMPLE PAYEE A"),
                 "payee from the line above the date should be captured: " + first.description());
+        assertTrue(first.description().contains("001/"),
+                "the ref tail from the line below should stay with this txn: " + first.description());
+
+        // the next txn must NOT inherit the previous txn's tail fragment
+        RawBankTxn second = byAmount("400.00");
+        assertTrue(second.description().contains("SAMPLE PAYEE B"), second.description());
+        assertFalse(second.description().contains("001"),
+                "previous txn's tail must not leak into this one: " + second.description());
 
         RawBankTxn credit = byAmount("5000.00");
         assertEquals(Sign.CREDIT, credit.sign());
