@@ -109,11 +109,11 @@ fetches it to open and re-save the workbook).
   cycle's statement PDFs to `workingDir/processed/<run_id>/` (timestamped). Discovery uses
   `Files.list` (top-level only), so the archive is never re-scanned. PDFs are *not* moved on
   first-run/`regenerate` (regenerate still needs them).
-- **Mandates** (card → paying bank, payment-identification pattern):
-  - `HDFC CC` ← HDFC bank, last-4 `8339`
-  - `HDFC RUPAY` ← HDFC bank, last-4 `3787`
-  - `YES CC` ← YES bank (only card from YES; pattern `CREDIT CARD`)
-  - `AXIS CC` ← HDFC bank, pattern `Axis` (`AxisCardParser`).
+- **Mandates & reconciliation:** each card maps to its **paying bank** plus a
+  **payment-identification pattern** — a substring on the debit narration, typically the card's
+  last-4 but any distinctive text (e.g. an issuer name). Reconciliation uses that pair to attribute
+  each `cc-payment` debit in a bank statement to the right card column. **The concrete mappings live
+  in `config.yaml` / `config.local.yaml`** — not duplicated here.
 - **Reconciliation tolerance:** a `cc-payment` debit that matches **no** configured card is
   **logged and skipped** (not a hard abort) — e.g. an intentionally `skip`-ped card. But **two
   debits matching the same card for the same prior month abort** (ambiguous double-payment/reversal),
