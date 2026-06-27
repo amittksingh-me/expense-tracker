@@ -36,8 +36,8 @@ The user declares a list of accounts. Each account has:
 
 The **matrix layout is derived from this config**: each `credit card` → one column; each
 `bank account` → a `Bank Debits / Credits/Transfers / Net Expenses` triplet. (The matrix has 4
-card columns + 4 bank triplets; the current config has 4 cards + 3 bank accounts — the 4th
-triplet has no statement yet. Nothing is hard-coded.)
+card columns + 4 bank triplets; the current config has 4 cards + 4 bank accounts. Nothing is
+hard-coded.)
 
 ### Mandates (which card is paid from which bank account)
 A mapping from each **credit card → the bank account its bill is debited from**. A single bank
