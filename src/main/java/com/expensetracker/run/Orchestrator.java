@@ -2,6 +2,7 @@ package com.expensetracker.run;
 
 import com.expensetracker.aggregate.Aggregator;
 import com.expensetracker.aggregate.MonthlyFigure;
+import com.expensetracker.card.AxisCardParser;
 import com.expensetracker.card.CardStatementParser;
 import com.expensetracker.card.HdfcCardParser;
 import com.expensetracker.card.ParsedCardStatement;
@@ -288,6 +289,7 @@ public final class Orchestrator {
         return switch (a.formatKey().toUpperCase()) {
             case "HDFC_CARD", "HDFC CC", "HDFC RUPAY" -> new HdfcCardParser(a.label());
             case "YES_CARD", "YES CC" -> new YesCardParser();
+            case "AXIS_CARD", "AXIS CC" -> new AxisCardParser();
             default -> throw new IllegalStateException(
                     "No card parser for format '" + a.formatKey() + "' (account " + a.label() + ")");
         };

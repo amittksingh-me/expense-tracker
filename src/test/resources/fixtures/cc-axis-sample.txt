@@ -1,0 +1,75 @@
+                                                                                                                             Axis REWARDS Credit Card
+
+SAMPLE TEST USER
+FLAT NO, BUILDING NAME
+AREA MAIN ROAD
+BANGALORE 560000 KAR
+
+
+
+
+                                                                                              PAYMENT SUMMARY
+       Total Payment Due                           Minimum Payment Due                                 Statement Period                               Payment Due Date                       Statement Generation Date
+           35,000.00 Dr                                    8,750.00 Dr                           22/04/2026 - 20/05/2026                                   09/06/2026                                         20/05/2026
+
+       Credit Card Number                                   Credit Limit                            Available Credit Limit                           Available Cash Limit                          For hassle free payments register for
+       550000******0000                                     300,000.00                                     250,000.00                                        90,000.00                             Auto-Debit facility on 18600000000
+
+
+               Previous Balance - Payments - Credits + Purchase + Cash Advance + Other Debit&Charges =Total Payment Due                                                                         Making only the minimum payment every
+                                                                                                                                                                                              month would result in the repayment stretching
+     34,000.00 Dr                  34,000.00               0.00             34,500.00                  0.00                         500.00                      35,000.00 Dr                   over years with consequent interest payment
+
+                                                                                                       Account Summary
+       DATE                                       TRANSACTION DETAILS                                                                                   MERCHANT CATEGORY                                      AMOUNT (Rs.)
+                     Card No: 550000******0000                       Name SAMPLE TEST USER
+ 21/04/2026            SAMPLE RETAIL STORE,SAMPLE CITY                                                                                         DEPT STORES                                                                    1,100.00 Dr
+ 21/04/2026            GST                                                                                                                                                                                                      80.00 Dr
+ 21/04/2026            SAMPLE FOOD DELIVERY,SAMPLE CITY                                                                                        RESTAURANTS                                                                      600.00 Dr
+ 21/04/2026            SAMPLE SERVICES,SAMPLE CITY                                                                                             MISCELLANEOUS                                                                    500.00 Dr
+ 21/04/2026            EMI PRINCIPAL - 3/6, REF# 60000000                                                                                      ELECTRONICS                                                                    9,000.00 Dr
+ 21/04/2026            EMI INTEREST - 3/6, REF# 60000000                                                                                       ELECTRONICS                                                                      500.00 Dr
+ 26/04/2026            SAMPLE FOOD DELIVERY,SAMPLE CITY                                                                                        RESTAURANTS                                                                    1,600.00 Dr
+ 27/04/2026            SAMPLE RETAIL STORE,SAMPLE CITY                                                                                         DEPT STORES                                                                    7,000.00 Dr
+ 02/05/2026            SAMPLE GROCERY,SAMPLE CITY                                                                                              DEPT STORES                                                                       20.00 Dr
+ 06/05/2026            SAMPLE MARKETPLACE,SAMPLE CITY                                                                                          DEPT STORES                                                                    1,000.00 Dr
+ 07/05/2026            BBPS PAYMENT RECEIVED - HD000000XXXXXXXXXXXX                                                                                                                                                          34,000.00 Cr
+ 18/05/2026            SAMPLE FASHION,SAMPLE CITY                                                                                              CLOTH STORES                                                                   9,000.00 Dr
+ 19/05/2026            SAMPLE RETAIL STORE,SAMPLE CITY                                                                                         DEPT STORES                                                                    3,000.00 Dr
+                                                                          EMI BALANCES
+                       SAMPLE ELECTRONICS                                                                                                       60000000                                                                        25,000.00
+
+
+
+               Your cheque should be payable to Axis Bank Card No.550000******0000 . Please write your NAME & TELEPHONE No. on the reverse of the cheque.
+               Axis Bank Maharashtra GST registration no.: 00XXXXX0000X0XX.
+
+                                                                                              CONTACT US
+    eDGE REWARD                  BALANCE AS             CUSTOMER ID
+       POINTS                     ON DATE
+           10000                   17-05-2026              900000000
+
+                                                                                                                                                                                                                        Page : 1 of 3
+                                         Axis REWARDS Credit Card
+DATE   TRANSACTION DETAILS                           MERCHANT CATEGORY   AMOUNT (Rs.)
+                        **** End of Statement ****
+
+  Minimum Amount Due Calculation
+
+Assume that you have paid all previous dues in full, and do not have any amount
+outstanding in your Credit Card Account, and your monthly statement is generated on
+the 15th of every month.
+
+ Txn Date   Type                                Cr/Db MAD Contribution         Amount
+ 25th Sep   Purchase                            Db                    2%         5000
+ 1st Oct    Joining Fees                        Db                  100%         1000
+ 1st Oct    GST on Joining Fees                 Db                  100%          180
+ 1st Oct    Cash Withdrawal                     Db                    2%         2000
+ 1st Oct    Cash Withdrawal Fee                 Db                  100%          500
+ 1st Oct    GST                                 Db                  100%           90
+ 15th Oct   Interest on Cash withdrawal         Db                     100%       36.99
+ 15th Oct   GST on Interest                     Db                    100%         6.66
+                                                      Total Amount Due          8813.65
+                                                     Minimum Amount Due         1953.65
+
+MAD = 2%*(5000+2000) + 100%*(1000+180+500+18+36.99+6.66) = 1953.65

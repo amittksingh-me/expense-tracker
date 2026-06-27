@@ -30,4 +30,12 @@ class CardParserTest {
         assertEquals(LocalDate.of(2026, 6, 12), s.billingDate());
         assertEquals(0, s.totalAmountDue().compareTo(new BigDecimal("500.00")));
     }
+
+    @Test
+    void axisCc() {
+        ParsedCardStatement s = new AxisCardParser().parse(Fixtures.lines("cc-axis-sample.txt"));
+        assertEquals(LocalDate.of(2026, 5, 20), s.billingDate());                 // Statement Generation Date
+        // Total Payment Due (35,000.00), NOT the illustrative "Total Amount Due 8813.65" example
+        assertEquals(0, s.totalAmountDue().compareTo(new BigDecimal("35000.00")));
+    }
 }
