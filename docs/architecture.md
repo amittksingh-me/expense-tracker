@@ -65,6 +65,12 @@
   abort.)
 - **Passwords never live in config.** A `SecretsProvider` fetches each statement password from
   the **macOS Keychain** via the `security` CLI on demand (never logged).
+- **Rotated-password fallbacks.** `SecretsProvider.passwords(label)` returns the current password
+  (`label`) plus any numbered fallbacks (`"label 1"`, `"label 2"`, …, discovered by probing until
+  the first gap). `PdfTextExtractor` tries them **in order, current first**, and uses the first that
+  decrypts — so when a bank rotates its statement password, older months still open by keeping the
+  previous password as `"label 1"`. Aborts only if none work. (The `MASTER` workbook password stays
+  single — it's re-saved with the current password each cycle.)
 
 ### Account labels (the identifier)
 A unique friendly **Label** per account is the single key used consistently across **config**, the
