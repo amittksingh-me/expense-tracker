@@ -39,7 +39,8 @@ class TaggingEngineTest {
             Rule.when("SALARY", SALARY),
             Rule.when("Hly Int", INTEREST),
             Rule.when("Int.Pd", INTEREST),
-            Rule.when("SAMPLE TEST USER", SELF_TRANSFER)   // family account — match the payee name, not the sender
+            Rule.when("SAMPLE TEST USER", SELF_TRANSFER),  // family account — match the payee name, not the sender
+            Rule.when("Sample User Niyo", SELF_TRANSFER)   // own-account transfer under a name variant
     );
 
     private static final TaggingEngine ENGINE = new TaggingEngine(RULES);
