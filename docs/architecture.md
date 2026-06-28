@@ -147,7 +147,7 @@ CLI (args)
   └─ Orchestrator (state machine: first-run / pending / complete / regenerate)
        ├─ ConfigLoader        → accounts, mandates, rules, paths (YAML)
        ├─ SecretsProvider     → passwords from macOS Keychain (`security`)
-       ├─ StatementDiscovery  → each PDF must resolve to exactly 1 account (fail-loud on 0/>1);
+       ├─ StatementDiscovery  → match each PDF to an account (>1 → abort; 0 → warn + skip);
        │                        accounts need NOT have a statement in a run (missing ≠ error)
        ├─ PdfTextExtractor    → `pdftotext -upw -layout` → text lines      [ONE shared component]
        ├─ Parser dispatch (account **format** → per-institution parser; a `switch`)
@@ -271,7 +271,7 @@ and live on existing components (not a separate validator framework), grouped by
 |---|---|---|
 | **Config load** | duplicate labels; mandate → unknown bank; active card missing payment pattern | `ConfigLoader.validate` |
 | **Startup** | matrix has no duplicate `Month Key` rows | `WorkbookService.duplicateMonthRows` |
-| **Discovery** | each PDF resolves to exactly one account (0/>1 → abort) | `StatementDiscovery` |
+| **Discovery** | each PDF matches ≤1 account (>1 → abort; **0 → warn + skip**) | `StatementDiscovery` |
 | **Discovery** | no two same-account bank statements with overlapping periods; no duplicate card+billing-month | `StatementOverlap` (+ Orchestrator card-dup check) |
 | **Parse** | extracted txns reconcile to printed totals (`opening + credits − debits = closing`) | `StatementBalanceValidator` |
 | **Reconciliation** | a `cc-payment` debit matches exactly one card; ≥2 debits for the same card/month → abort | `CardPaymentMatcher` / `Reconciler` |

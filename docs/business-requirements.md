@@ -383,9 +383,13 @@ downgrades a green cell, but a **newer statement** re-opens it (→ amber). Ther
 transient highlight** for updated cells — bank figures are written with no fill.
 
 ### Error handling
-The process favours **failing loudly** over guessing. If a statement PDF matches **no** account
-pattern or **more than one**, a password fails, or a statement cannot be parsed, the run **logs
-the error and aborts** — it never silently skips a file or writes partial data. It **also
+The process favours **failing loudly** over guessing. If a statement PDF matches **more than one**
+account pattern, a password fails, or a statement cannot be parsed, the run **logs the error and
+aborts** — it never writes partial data. The one exception is a PDF that matches **no** account
+pattern: it is **logged as a warning and skipped** (so unrelated files — e.g. statements for
+accounts the user does not track — can sit in the working directory without blocking a run). A
+mistyped pattern therefore **silently drops** that account's statement (only a warning is emitted),
+so the warning should be reviewed. The run **also
 aborts if two statements for the same account would double-count**:
 - **Bank accounts:** two statements whose **declared start/end periods overlap** (e.g. a duplicate
   or a re-issued statement left beside the original). Overlap is judged on the declared period, not
