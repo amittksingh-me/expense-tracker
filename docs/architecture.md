@@ -251,9 +251,12 @@ the requirement of a single Transactions sheet and enabling **account-scoped rul
 transaction identity — kept separate so `TaggingEngine` stays a pure rules→tag function.
 
 Loading rules from config is I/O and **deferred**; the engine takes them as objects.
-**Pattern-matching mode:** a rule's pattern is a **case-insensitive substring** of the
-`Description` (readable plain strings, no regex escaping — chosen for easy hand-editing).
-Matches anywhere in the description; rules may also be scoped to an account and/or `Sign`.
+**Pattern-matching mode:** a rule's pattern is a **case- and whitespace-insensitive substring** of
+the `Description` (readable plain strings, no regex escaping — chosen for easy hand-editing).
+Matching strips all whitespace from both sides first, because `pdftotext -layout` splits words with
+stray spaces at column boundaries (`SAMPLE` → `SAMP LE`) and the breaks move between statements;
+squashing whitespace makes a readable pattern robust to that. Matches anywhere in the description; rules may
+also be scoped to an account and/or `Sign`.
 
 ### Testing (golden-file / characterization)
 Parse all fixtures → unify with labels → tag with a fixed ruleset → compare against one
