@@ -34,7 +34,7 @@ class TaggingEngineTest {
             Rule.when("CAMS", INVESTMENT),
             Rule.when("KFINTECH", INVESTMENT),
             Rule.inAccount("HDFC", "Autopay", CC_PAYMENT),
-            Rule.inAccount("HDFC", "Axis", CC_PAYMENT),
+            Rule.inAccount("HDFC", "Axis Ba", CC_PAYMENT),   // "Axis Ba(nk)" SI debit — not UPI "okaxis" handles
             Rule.when("CREDIT CARD", CC_PAYMENT),
             Rule.when("SALARY", SALARY),
             Rule.when("Hly Int", INTEREST),
