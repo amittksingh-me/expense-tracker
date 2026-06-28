@@ -58,7 +58,8 @@ public final class ConfigLoader {
             Map<String, Object> m = (Map<String, Object>) o;
             String sign = optStr(m, "sign");
             rules.add(new Rule(
-                    str(m, "pattern"),
+                    optStr(m, "pattern"),
+                    allOfList(m),
                     optStr(m, "account"),
                     sign == null ? null : Sign.valueOf(sign.toUpperCase()),
                     Tag.valueOf(str(m, "tag").toUpperCase())));
@@ -107,5 +108,11 @@ public final class ConfigLoader {
     private static String optStr(Map<String, Object> m, String key) {
         Object v = m.get(key);
         return v == null ? null : v.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> allOfList(Map<String, Object> m) {
+        Object v = m.get("allOf");
+        return v == null ? List.of() : (List<String>) v;
     }
 }

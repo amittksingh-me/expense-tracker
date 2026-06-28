@@ -256,7 +256,9 @@ the `Description` (readable plain strings, no regex escaping — chosen for easy
 Matching strips all whitespace from both sides first, because `pdftotext -layout` splits words with
 stray spaces at column boundaries (`SAMPLE` → `SAMP LE`) and the breaks move between statements;
 squashing whitespace makes a readable pattern robust to that. Matches anywhere in the description; rules may
-also be scoped to an account and/or `Sign`.
+also be scoped to an account and/or `Sign`. A rule may instead carry an **`allOf`** list — it matches
+only when **all** of those substrings are present (any order), an AND a single substring can't express
+(e.g. a UPI self-transfer needing both endpoints' VPAs, in either direction).
 
 ### Testing (golden-file / characterization)
 Parse all fixtures → unify with labels → tag with a fixed ruleset → compare against one

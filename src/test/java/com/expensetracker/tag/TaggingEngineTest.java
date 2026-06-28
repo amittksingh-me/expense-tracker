@@ -46,7 +46,10 @@ class TaggingEngineTest {
             Rule.when("auto_redemption", INTEREST),        // interest before the spouse self-transfer rule
             Rule.when("SAMPLE TEST USER", SELF_TRANSFER),  // family account — match the payee name, not the sender
             Rule.when("Sample User Niyo", SELF_TRANSFER),  // own-account transfer under a name variant
-            Rule.when("Sample Spouse", SELF_TRANSFER)      // spouse (family) account — whitespace-insensitive
+            Rule.when("Sample Spouse", SELF_TRANSFER),     // spouse (family) account — whitespace-insensitive
+            // UPI: BOTH endpoints must be own/family — own VPA AND family VPA present (any order/direction,
+            // any @app). A payment from the same own VPA to a merchant has only one → does NOT match.
+            Rule.allOf(SELF_TRANSFER, "sampleuser", "samplekin")
     );
 
     private static final TaggingEngine ENGINE = new TaggingEngine(RULES);

@@ -58,9 +58,13 @@ system can match each `cc-payment` debit to the correct card column.
 Classification is **rule-based**: the system auto-tags bank transactions using a
 user-maintainable set of **rules**. Each rule is a **case- and whitespace-insensitive text-substring
 match on the `Description`** (the user specifies a distinctive, readable part of a transaction's
-narration), optionally scoped to a specific account or `Sign`, and assigns a `Tag`. **Rules are
-evaluated in configuration order — the first matching rule wins** (so order specific rules above
-broad ones). When no rule matches, defaults apply: a debit → `expense`, a credit → `refund`.
+narration), optionally scoped to a specific account or `Sign`, and assigns a `Tag`. A rule may
+instead require **all of several substrings** to be present (an `allOf` list, matched in any order)
+— for cases where a single substring can't capture the condition, e.g. a UPI **self-transfer** that
+is only a self-transfer when **both** endpoints are own/family (the narration must contain both your
+own and a family member's identifier, in either direction). **Rules are evaluated in configuration
+order — the first matching rule wins** (so order specific rules above broad ones). When no rule
+matches, defaults apply: a debit → `expense`, a credit → `refund`.
 
 > **Decision — whitespace-insensitive matching:** the statement extractor (`pdftotext -layout`)
 > frequently splits a word with stray spaces at column boundaries (e.g. `SAMPLE` → `SAMP LE`), and
