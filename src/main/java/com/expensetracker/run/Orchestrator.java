@@ -196,7 +196,7 @@ public final class Orchestrator {
             if (a.skip() || !a.isBank()) {
                 continue;
             }
-            List<String> lines = extractor.extract(m.file(), secrets.password(a.label()));
+            List<String> lines = extractor.extract(m.file(), secrets.passwords(a.label()));
             ParsedBankStatement ps = bankParser(a).parse(lines);
             if (ps.periodStart() == null || ps.periodEnd() == null) {
                 throw new IllegalStateException("Cannot determine statement period for " + a.label()
@@ -226,7 +226,7 @@ public final class Orchestrator {
                 log.info("  skipped card {} (ignored / image-only)", a.label());
                 continue;
             }
-            List<String> lines = extractor.extract(m.file(), secrets.password(a.label()));
+            List<String> lines = extractor.extract(m.file(), secrets.passwords(a.label()));
             ParsedCardStatement cs = cardParser(a).parse(lines);
             YearMonth billMonth = YearMonth.from(cs.billingDate());
             if (!seenCardMonths.add(a.label() + "|" + billMonth)) {
