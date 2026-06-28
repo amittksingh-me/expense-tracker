@@ -38,6 +38,16 @@ security add-generic-password -s expense-tracker -a "HDFC"   -T /usr/bin/securit
 # ... repeat for NIYO, YES, ICICI, "HDFC CC", "HDFC RUPAY", "YES CC", "AXIS CC", and MASTER
 ```
 
+**Rotated statement passwords (fallbacks).** If a bank changes its PDF password, keep the old one
+as a numbered fallback so older months still open: store the previous password as `"<account> 1"`,
+the one before that as `"<account> 2"`, and so on (contiguous from 1). The tool tries the current
+password first, then each fallback in order, and only fails if none decrypt the file.
+
+```bash
+# YES rotated its password — keep the old one as the first fallback:
+security add-generic-password -s expense-tracker -a "YES 1" -T /usr/bin/security -U -w   # old password
+```
+
 ## Configure
 
 `src/main/resources/config.yaml` is a **public template** with placeholder values. For real runs,
