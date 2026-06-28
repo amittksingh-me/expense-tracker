@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -68,6 +69,9 @@ public final class TransactionsSheet {
         for (int c = 0; c < HEADERS.length; c++) {
             sheet.autoSizeColumn(c);
         }
+        // AutoFilter over the header + data range so the human can filter/sort the review sheet.
+        // (re)set on every first-run/regenerate, since the sheet is rebuilt each time.
+        sheet.setAutoFilter(new CellRangeAddress(0, r - 1, 0, HEADERS.length - 1));
     }
 
     public static List<TaggedTxn> read(Sheet sheet) {

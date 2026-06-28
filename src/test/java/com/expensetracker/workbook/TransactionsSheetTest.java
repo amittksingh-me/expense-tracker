@@ -15,8 +15,26 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TransactionsSheetTest {
+
+    @Test
+    void hasAutoFilterOverHeaderAndData() throws Exception {
+        try (Workbook wb = new XSSFWorkbook()) {
+            Sheet sheet = wb.createSheet(TransactionsSheet.NAME);
+            List<TaggedTxn> in = List.of(
+                    new TaggedTxn(new BankTxn("HDFC", LocalDate.of(2026, 5, 1), "a",
+                            new BigDecimal("1.00"), Sign.DEBIT), Tag.EXPENSE),
+                    new TaggedTxn(new BankTxn("YES", LocalDate.of(2026, 5, 2), "b",
+                            new BigDecimal("2.00"), Sign.CREDIT), Tag.REFUND));
+            TransactionsSheet.write(sheet, in, t -> "", t -> false);
+
+            var ct = ((org.apache.poi.xssf.usermodel.XSSFSheet) sheet).getCTWorksheet();
+            assertTrue(ct.isSetAutoFilter(), "Transactions sheet should carry an AutoFilter");
+            assertEquals("A1:I3", ct.getAutoFilter().getRef());   // 9 columns (A–I), header + 2 data rows
+        }
+    }
 
     @Test
     void roundTrips() throws Exception {
