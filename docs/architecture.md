@@ -38,7 +38,8 @@
   touches POI):
   - open the **password-protected** workbook and re-save it encrypted (password = Keychain `MASTER`);
   - read the master matrix, the `Control` status, and the Transactions sheet (incl. its pinned rows);
-  - write/refresh the Transactions sheet;
+  - write/refresh the Transactions sheet (with an **AutoFilter** over its header row, re-applied on
+    every first-run/regenerate);
   - **upsert** month rows — write only system-owned cells, **preserve native formulas and the
     manual `Comments`**, apply cell-fill **visual cues**; an **append copies the previous row**
     (styles + formulas, references shifted) so customizations propagate (see below);
