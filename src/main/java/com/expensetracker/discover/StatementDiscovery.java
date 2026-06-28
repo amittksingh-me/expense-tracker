@@ -1,6 +1,8 @@
 package com.expensetracker.discover;
 
 import com.expensetracker.config.Account;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -13,9 +15,13 @@ import java.util.stream.Stream;
 
 /**
  * Matches the PDF files in the working directory to configured accounts by their {@code pdfPattern}.
- * Fails loud if a PDF matches no account or more than one (per the error-handling rules).
+ * A PDF matching <b>more than one</b> account is ambiguous and <b>aborts</b> the run; a PDF matching
+ * <b>no</b> account is <b>logged as a warning and skipped</b> (so unrelated files can sit in the
+ * working directory without blocking a run).
  */
 public final class StatementDiscovery {
+
+    private static final Logger log = LoggerFactory.getLogger(StatementDiscovery.class);
 
     public record Match(Account account, Path file) {
     }
@@ -35,7 +41,8 @@ public final class StatementDiscovery {
                     .filter(a -> Pattern.compile(a.pdfPattern()).matcher(name).find())
                     .toList();
             if (hits.isEmpty()) {
-                throw new IllegalStateException("No account matches statement file: " + name);
+                log.warn("ignoring unknown statement file (matches no configured account): {}", name);
+                continue;
             }
             if (hits.size() > 1) {
                 throw new IllegalStateException("Statement file matches multiple accounts: " + name
