@@ -33,14 +33,20 @@ class TaggingEngineTest {
     private static final List<Rule> RULES = List.of(
             Rule.when("CAMS", INVESTMENT),
             Rule.when("KFINTECH", INVESTMENT),
+            Rule.when("Test User PPF", INVESTMENT),         // PPF/SSA before self-transfer names
+            Rule.when("Child SSA", INVESTMENT),
             Rule.inAccount("HDFC", "Autopay", CC_PAYMENT),
             Rule.inAccount("HDFC", "Axis Ba", CC_PAYMENT),   // "Axis Ba(nk)" SI debit — not UPI "okaxis" handles
             Rule.when("CREDIT CARD", CC_PAYMENT),
             Rule.when("SALARY", SALARY),
             Rule.when("Hly Int", INTEREST),
             Rule.when("Int.Pd", INTEREST),
+            Rule.when("Interest paid", INTEREST),
+            Rule.when("Credit Interest", INTEREST),
+            Rule.when("auto_redemption", INTEREST),        // interest before the spouse self-transfer rule
             Rule.when("SAMPLE TEST USER", SELF_TRANSFER),  // family account — match the payee name, not the sender
-            Rule.when("Sample User Niyo", SELF_TRANSFER)   // own-account transfer under a name variant
+            Rule.when("Sample User Niyo", SELF_TRANSFER),  // own-account transfer under a name variant
+            Rule.when("Sample Spouse", SELF_TRANSFER)      // spouse (family) account — whitespace-insensitive
     );
 
     private static final TaggingEngine ENGINE = new TaggingEngine(RULES);

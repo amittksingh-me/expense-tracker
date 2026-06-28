@@ -56,11 +56,18 @@ system can match each `cc-payment` debit to the correct card column.
 
 ### Tagging rules
 Classification is **rule-based**: the system auto-tags bank transactions using a
-user-maintainable set of **rules**. Each rule is a **case-insensitive text-substring match on the
-`Description`** (the user specifies a distinctive, readable part of a transaction's narration),
-optionally scoped to a specific account or `Sign`, and assigns a `Tag`. **Rules are evaluated in
-configuration order — the first matching rule wins** (so order specific rules above broad ones).
-When no rule matches, defaults apply: a debit → `expense`, a credit → `refund`.
+user-maintainable set of **rules**. Each rule is a **case- and whitespace-insensitive text-substring
+match on the `Description`** (the user specifies a distinctive, readable part of a transaction's
+narration), optionally scoped to a specific account or `Sign`, and assigns a `Tag`. **Rules are
+evaluated in configuration order — the first matching rule wins** (so order specific rules above
+broad ones). When no rule matches, defaults apply: a debit → `expense`, a credit → `refund`.
+
+> **Decision — whitespace-insensitive matching:** the statement extractor (`pdftotext -layout`)
+> frequently splits a word with stray spaces at column boundaries (e.g. `SAMPLE` → `SAMP LE`), and
+> the break points move between statements. So matching ignores **all** whitespace in both the
+> pattern and the description — a readable pattern like `SAMPLE TEST USER` matches however the
+> narration was wrapped. Keep patterns **distinctive**, since squashing whitespace slightly widens
+> what a short pattern can hit.
 
 > **Decision:** patterns are plain substrings (chosen for readability), not regex. Full regex is
 > deferred — it can be reintroduced behind a per-rule `patternType: SUBSTRING | REGEX` flag if a
