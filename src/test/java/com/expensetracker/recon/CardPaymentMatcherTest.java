@@ -20,7 +20,7 @@ class CardPaymentMatcherTest {
             card("HDFC CC", "HDFC", "8339", false),
             card("HDFC RUPAY", "HDFC", "3787", false),
             card("YES CC", "YES", "CREDIT CARD", false),
-            card("AXIS CC", "HDFC", "Axis", true)));   // ignored
+            card("AXIS CC", "HDFC", "Axis Ba", true)));   // ignored
 
     @Test
     void matchesByBankAndPattern() {
