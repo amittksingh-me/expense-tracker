@@ -26,6 +26,14 @@ import java.util.regex.Pattern;
  * each transaction's narration = the fragment line directly above its date row + the
  * fragment(s) directly below it. For a 2-line gap between date rows, the upper line is the
  * previous transaction's tail and the lower line is the next transaction's head.
+ *
+ * <p>Two statement renderings are supported. The older layout leaves the Chq/Ref column blank and
+ * prints amounts with exactly two decimals; the newer layout prints {@code -} in Chq/Ref and
+ * strips trailing zeros from amounts ({@code 250.50 -> 250.5}, {@code 41.00 -> 41}). The newer
+ * period line also uses slashes ({@code 01/06/2026 ... to ...}) and its Total row's third value is
+ * the <b>net movement</b>, not the closing balance. Dates are normalised before parsing; amounts
+ * accept 0–2 decimals; transaction rows are parsed from the right (the final three tokens are
+ * always withdrawal / deposit / balance), with a trailing {@code -} Chq/Ref token dropped.
  */
 public final class NiyoBankParser implements BankStatementParser {
 
@@ -36,21 +44,26 @@ public final class NiyoBankParser implements BankStatementParser {
     private static final String TOTAL_LABEL     = "Total";
     private static final String BROUGHT_FORWARD = "B/F";
     private static final String EMPTY_AMOUNT    = "-";
+    private static final String AMOUNT_TOKEN    = "-|[\\d,]+(?:\\.\\d{1,2})?";
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd-MM-uuuu");
     // ──────────────────────────────────────────────────────────────────────────────────
 
-    /** date + (usually empty) narration + withdrawal + deposit + balance; amounts may be "-". */
-    private static final Pattern TXN = Pattern.compile(
-            "^\\s*(\\d{2}-\\d{2}-\\d{4})\\s+(.*?)\\s+(-|[\\d,]+\\.\\d{2})\\s+(-|[\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})\\s*$");
+    /** Date at the start of a transaction row; the rest is split into tokens. */
+    private static final Pattern TXN_DATE = Pattern.compile("^\\s*(\\d{2}[-/]\\d{2}[-/]\\d{4})\\s+(.*)$");
+
+    /** One amount column: {@code -} or a number with optional 1–2 decimal places. */
+    private static final Pattern AMOUNT = Pattern.compile(AMOUNT_TOKEN);
 
     private static final Pattern PERIOD = Pattern.compile(
-            Pattern.quote(PERIOD_LABEL) + "\\s+(\\d{2}-\\d{2}-\\d{4})\\s+To\\s+(\\d{2}-\\d{2}-\\d{4})",
+            Pattern.quote(PERIOD_LABEL)
+                    + "\\s+(\\d{2}[-/]\\d{2}[-/]\\d{4})\\s+to\\s+(\\d{2}[-/]\\d{2}[-/]\\d{4})",
             Pattern.CASE_INSENSITIVE);
 
     private static final Pattern ACCOUNT = Pattern.compile(Pattern.quote(ACCOUNT_LABEL) + "\\.?\\s*:\\s*(\\d+)");
 
     private static final Pattern TOTAL = Pattern.compile(
-            "^\\s*" + Pattern.quote(TOTAL_LABEL) + "\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})\\s+([\\d,]+\\.\\d{2})\\s*$");
+            "^\\s*" + Pattern.quote(TOTAL_LABEL) + "\\s+(" + AMOUNT_TOKEN + ")\\s+(" + AMOUNT_TOKEN
+                    + ")\\s+(" + AMOUNT_TOKEN + ")\\s*$");
 
     @Override
     public String bankLabel() {
@@ -66,6 +79,8 @@ public final class NiyoBankParser implements BankStatementParser {
         BigDecimal closing = null;
         BigDecimal totalDebits = null;
         BigDecimal totalCredits = null;
+        BigDecimal totalClosingOrNet = null;
+        BigDecimal lastBalance = null;
 
         List<Draft> drafts = new ArrayList<>();
         List<String> buffer = new ArrayList<>();   // narration fragments since the last date row
@@ -78,8 +93,8 @@ public final class NiyoBankParser implements BankStatementParser {
             if (periodStart == null) {
                 Matcher m = PERIOD.matcher(line);
                 if (m.find()) {
-                    periodStart = LocalDate.parse(m.group(1), DATE);
-                    periodEnd = LocalDate.parse(m.group(2), DATE);
+                    periodStart = date(m.group(1));
+                    periodEnd = date(m.group(2));
                 }
             }
             if (accountLast4 == null) {
@@ -101,7 +116,9 @@ public final class NiyoBankParser implements BankStatementParser {
             if (total.matches()) {
                 totalDebits = amount(total.group(1));
                 totalCredits = amount(total.group(2));
-                closing = amount(total.group(3));
+                // Older layout: this is the closing balance. Newer layout: it is net movement;
+                // the closing balance is then taken from the final transaction row instead.
+                totalClosingOrNet = amount(total.group(3));
                 if (prev != null) {
                     prev.appendAll(buffer);   // remaining fragments are the last txn's tail
                 }
@@ -113,17 +130,14 @@ public final class NiyoBankParser implements BankStatementParser {
                 continue;
             }
 
-            Matcher m = TXN.matcher(line);
-            if (m.matches()) {
-                String inlineNarr = m.group(2).trim();
-                String w = m.group(3);
-                String d = m.group(4);
-                String bal = m.group(5);
-                boolean wEmpty = EMPTY_AMOUNT.equals(w);
-                boolean dEmpty = EMPTY_AMOUNT.equals(d);
+            Row row = row(line);
+            if (row != null) {
+                boolean wEmpty = EMPTY_AMOUNT.equals(row.withdrawal());
+                boolean dEmpty = EMPTY_AMOUNT.equals(row.deposit());
+                lastBalance = amount(row.balance());
 
-                if (inlineNarr.contains(BROUGHT_FORWARD) || (wEmpty && dEmpty)) {
-                    opening = amount(bal);           // brought-forward row → opening balance, not a txn
+                if (row.inlineNarration().contains(BROUGHT_FORWARD) || (wEmpty && dEmpty)) {
+                    opening = amount(row.balance());   // brought-forward row → opening balance, not a txn
                     if (prev != null) {
                         prev.appendAll(buffer);
                     }
@@ -131,9 +145,16 @@ public final class NiyoBankParser implements BankStatementParser {
                     continue;
                 }
 
-                // split the buffer: last fragment is this txn's head; the rest is prev txn's tail
+                // Split the buffer between the previous txn's tail and this txn's head. When this
+                // date row carries inline narration (newer layout), every buffered fragment is the
+                // previous txn's tail. When it does not (older layout), the last fragment is this
+                // txn's head and the rest is the previous txn's tail.
                 String head = "";
-                if (!buffer.isEmpty()) {
+                if (!row.inlineNarration().isEmpty()) {
+                    if (prev != null) {
+                        prev.appendAll(buffer);
+                    }
+                } else if (!buffer.isEmpty()) {
                     head = buffer.remove(buffer.size() - 1);
                     if (prev != null) {
                         prev.appendAll(buffer);
@@ -142,8 +163,8 @@ public final class NiyoBankParser implements BankStatementParser {
                 buffer.clear();
 
                 Sign sign = wEmpty ? Sign.CREDIT : Sign.DEBIT;
-                BigDecimal value = wEmpty ? amount(d) : amount(w);
-                Draft cur = new Draft(LocalDate.parse(m.group(1), DATE), value, sign, combine(inlineNarr, head));
+                BigDecimal value = wEmpty ? amount(row.deposit()) : amount(row.withdrawal());
+                Draft cur = new Draft(row.date(), value, sign, combine(row.inlineNarration(), head));
                 drafts.add(cur);
                 prev = cur;
                 continue;
@@ -157,6 +178,10 @@ public final class NiyoBankParser implements BankStatementParser {
             prev.appendAll(buffer);
         }
 
+        // Prefer the final transaction row's balance: it is the closing balance in both layouts
+        // (the newer Total row's third column is net movement, not closing).
+        closing = lastBalance != null ? lastBalance : totalClosingOrNet;
+
         List<RawBankTxn> txns = new ArrayList<>(drafts.size());
         for (Draft draft : drafts) {
             txns.add(draft.toTxn());
@@ -165,11 +190,61 @@ public final class NiyoBankParser implements BankStatementParser {
         return new ParsedBankStatement(accountLast4, periodStart, periodEnd, txns, printedTotals);
     }
 
+    /**
+     * Parses a transaction row from the right: the final three tokens are always withdrawal,
+     * deposit and balance, so the older layout (no Chq/Ref token) and the newer layout (usually a
+     * {@code -} Chq/Ref token) share one path. Everything before them is the inline narration.
+     */
+    private static Row row(String line) {
+        Matcher m = TXN_DATE.matcher(line);
+        if (!m.matches()) {
+            return null;
+        }
+        String rest = m.group(2).trim();
+        if (rest.isEmpty()) {
+            return null;
+        }
+        String[] tokens = rest.split("\\s+");
+        if (tokens.length < 3) {
+            return null;
+        }
+        int n = tokens.length;
+        String withdrawal = tokens[n - 3];
+        String deposit = tokens[n - 2];
+        String balance = tokens[n - 1];
+        if (!isAmount(withdrawal) || !isAmount(deposit) || !isAmount(balance)) {
+            return null;
+        }
+        List<String> prefix = new ArrayList<>();
+        for (int i = 0; i < n - 3; i++) {
+            prefix.add(tokens[i]);
+        }
+        // The newer layout fills the otherwise-blank Chq/Ref column with "-"; drop that token so
+        // it does not leak into the narration. The older layout leaves the column blank.
+        if (!prefix.isEmpty() && EMPTY_AMOUNT.equals(prefix.get(prefix.size() - 1))) {
+            prefix.remove(prefix.size() - 1);
+        }
+        return new Row(date(m.group(1)), String.join(" ", prefix), withdrawal, deposit, balance);
+    }
+
+    private static boolean isAmount(String token) {
+        return AMOUNT.matcher(token).matches();
+    }
+
+    private static LocalDate date(String token) {
+        return LocalDate.parse(token.replace('/', '-'), DATE);
+    }
+
     private static String combine(String inline, String head) {
         if (inline.isEmpty()) {
             return head;
         }
         return head.isEmpty() ? inline : inline + " " + head;
+    }
+
+    /** One parsed transaction row before narration stitching. */
+    private record Row(LocalDate date, String inlineNarration,
+                       String withdrawal, String deposit, String balance) {
     }
 
     /** Mutable accumulator: narration is built as head (above) then tail (below) fragments. */
